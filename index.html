@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroBill - Water Billing System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="text-gray-800 h-screen flex flex-col">
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <main id="app" class="flex-grow flex items-center justify-center p-4">
+        
+        <!-- 1. LOGIN VIEW -->
+        <div id="login-view" class="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden fade-in">
+            <div class="flex border-b">
+                <button onclick="switchAuthTab('admin')" id="tab-admin" class="flex-1 py-4 text-center font-semibold text-blue-600 border-b-2 border-blue-600 bg-blue-50">
+                    Admin Sign In
+                </button>
+                <button onclick="switchAuthTab('customer')" id="tab-customer" class="flex-1 py-4 text-center font-semibold text-gray-500 hover:text-blue-500">
+                    Customer Sign In
+                </button>
+            </div>
+            
+            <div class="p-8">
+                <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h2>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email / Username</label>
+                        <input type="text" id="login-email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter email">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="login-password" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-medium">Sign In</button>
+                </form>
+                <div class="mt-4 text-xs text-gray-400 text-center">
+                    <p>Demo Credentials:</p>
+                    <p>Admin: <span class="font-mono">admin@water.com</span> / <span class="font-mono">admin123</span></p>
+                    <p>Customer: <span class="font-mono">user@water.com</span> / <span class="font-mono">user123</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ADMIN DASHBOARD VIEW -->
+        <div id="admin-view" class="hidden w-full h-full flex flex-col md:flex-row bg-gray-100 overflow-hidden max-w-7xl mx-auto fade-in">
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 bg-slate-900 text-white p-6 flex flex-col">
+                <div class="flex items-center gap-3 mb-8 text-cyan-400">
+                    <i class="fa-solid fa-faucet-drip text-2xl"></i>
+                    <span class="text-xl font-bold">HydroAdmin</span>
+                </div>
+                <nav class="space-y-4">
+                    <div class="text-xs uppercase text-gray-400 font-semibold mb-2">Management</div>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-slate-800 rounded-lg text-white">
+                        <i class="fa-solid fa-users"></i> Customers
+                    </a>
+                    <button onclick="logout()" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition w-full text-left">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="flex-1 p-6 overflow-y-auto">
+                <header class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Customer Billing Management</h1>
+                        <p class="text-gray-500 text-sm">Manage meter readings and generate bills.</p>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-user-circle text-3xl text-gray-400"></i>
+                    </div>
+                </header>
+
+                <!-- Search & Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="md:col-span-2 bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center gap-4">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                        <input type="text" id="admin-search" onkeyup="renderCustomerTable()" placeholder="Search customer by name..." class="w-full outline-none text-gray-700">
+                    </div>
+                    <div class="bg-blue-600 p-4 rounded-lg shadow-sm text-white flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm">Total Customers</p>
+                            <p class="text-2xl font-bold" id="total-customers-count">0</p>
+                        </div>
+                        <i class="fa-solid fa-users text-3xl text-blue-400"></i>
+                    </div>
+                </div>
+
+                <!-- Customer Table -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 text-gray-600 text-sm uppercase">
+                                <tr>
+                                    <th class="p-4 border-b">Name</th>
+                                    <th class="p-4 border-b">Email</th>
+                                    <th class="p-4 border-b">Last Reading</th>
+                                    <th class="p-4 border-b">Status</th>
+                                    <th class="p-4 border-b text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customer-table-body" class="text-sm">
+                                <!-- JS renders rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. CUSTOMER DASHBOARD VIEW -->
+        <div id="customer-view" class="hidden w-full h-full flex flex-col bg-gray-100 fade-in max-w-5xl mx-auto">
+            <!-- Navbar -->
+            <nav class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-blue-600 font-bold text-xl">
+                    <i class="fa-solid fa-faucet-drip"></i> HydroBill
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-gray-600 font-medium" id="customer-name-display">Welcome, User</span>
+                    <button onclick="logout()" class="text-red-500 hover:text-red-700 text-sm font-medium">Logout</button>
+                </div>
+            </nav>
+
+            <div class="p-6 flex flex-col md:flex-row gap-6 flex-grow overflow-y-auto">
+                <!-- Profile & Status -->
+                <div class="w-full md:w-1/3 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Account Info</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Customer ID:</span>
+                                <span class="font-medium" id="c-id">#001</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-500">Email:</span>
+                                <span class="font-medium" id="c-email">user@example.com</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Month Bill Card -->
+                    <div class="bg-gradient-to-br from-blue-600 to-cyan-600 p-6 rounded-xl shadow-lg text-white">
+                        <p class="text-blue-100 text-sm mb-1">Current Month Due</p>
+                        <h2 class="text-3xl font-bold mb-4" id="current-bill-amount">Rs 0.00</h2>
+                        <div class="bg-white/20 p-3 rounded-lg text-sm backdrop-blur-sm">
+                            <p class="flex justify-between"><span>Units Consumed:</span> <span id="current-units-consumed" class="font-bold">0</span></p>
+                            <p class="flex justify-between mt-1"><span>Rate Applied:</span> <span id="current-rate">Slab & Decimal</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bill History -->
+                <div class="w-full md:w-2/3 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col">
+                    <div class="p-5 border-b">
+                        <h3 class="font-bold text-gray-800">Billing History</h3>
+                    </div>
+                    <div class="overflow-x-auto flex-grow">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                                <tr>
+                                    <th class="p-4">Month</th>
+                                    <th class="p-4">Prev Reading</th>
+                                    <th class="p-4">Pres Reading</th>
+                                    <th class="p-4">Units Used</th>
+                                    <th class="p-4 text-right">Total (Rs)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bill-history-body" class="text-sm divide-y divide-gray-100">
+                                <!-- JS renders history here -->
+                            </tbody>
+                        </table>
+                        <div id="no-bills-msg" class="hidden p-8 text-center text-gray-400">
+                            No billing history available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ADMIN MODAL: ADD BILLING -->
+    <div id="billing-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Add Meter Reading</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            
+            <form id="billing-form" onsubmit="handleBillingSubmit(event)">
+                <input type="hidden" id="modal-customer-id">
+                
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Customer</label>
+                    <div id="modal-customer-name" class="font-medium text-gray-800 bg-gray-100 p-2 rounded">Customer Name</div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Last Month Units</label>
+                        <input type="text" id="modal-prev-units" readonly class="w-full bg-gray-100 text-gray-600 p-2 rounded border cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Select Month</label>
+                        <input type="month" id="modal-month" required class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Present Month Units</label>
+                    <!-- step="0.01" allows decimal input -->
+                    <input type="number" id="modal-present-units" required min="0" step="0.01" oninput="previewCalculation()" class="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none text-lg font-bold text-blue-600" placeholder="0.00">
+                    <p class="text-xs text-gray-500 mt-1">Enter current meter reading.</p>
+                </div>
+
+                <!-- Calculation Breakdown Preview -->
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
+                    <div class="text-xs font-bold text-blue-800 uppercase mb-2">Calculation Preview</div>
+                    <div id="calc-breakdown" class="text-sm text-gray-700 space-y-1 mb-2 border-b border-blue-200 pb-2">
+                        <!-- Dynamic breakdown goes here -->
+                        <p class="text-gray-400 italic">Enter units to preview...</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="font-bold text-blue-800">Total Bill:</span>
+                        <span id="preview-total" class="font-bold text-xl text-blue-600">Rs 0.00</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">Save Bill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>
