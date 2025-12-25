@@ -9,9 +9,9 @@ const state = {
     ],
     bills: [
         // History
-        { id: 'b1', customerId: 'u2', month: '2023-08', presentUnits: 100, prevUnits: 90, consumed: 10, total: 650 },
-        { id: 'b2', customerId: 'u2', month: '2023-09', presentUnits: 1132.1, prevUnits: 100, consumed: 12, total: 850 }, // Example: 10*65 + 2*70
-        { id: 'b3', customerId: 'u3', month: '2023-09', presentUnits: 50.5, prevUnits: 45, consumed: 5.5, total: 363 } // Example: 5*65 + 0.5*6
+        { id: 'b1', customerId: 'u2', month: '2023-08', presentUnits: 100, prevUnits: 90, consumed: 10, total: 900 }, // 650+250
+        { id: 'b2', customerId: 'u2', month: '2023-09', presentUnits: 1132.1, prevUnits: 100, consumed: 12.1, total: 1146 }, // (650+70+6) + 250
+        { id: 'b3', customerId: 'u3', month: '2023-09', presentUnits: 50.5, prevUnits: 45, consumed: 5.5, total: 643 } // (325+30) + 250
     ]
 };
 
@@ -71,24 +71,22 @@ function logout() {
     showToast("Logged out successfully.", 'info');
 }
 
-// --- 3. BILLING LOGIC (UPDATED) ---
+// --- 3. BILLING LOGIC ---
 
 /**
- * Calculates the bill based on:
- * 1. Units 1 to 10 @ Rs 65
- * 2. Units > 10 @ Rs 70
- * 3. Decimal units @ Rs 60 (Adjusted to match user request of 0.8 = 48)
+ * Calculates the water usage cost only.
+ * Input units expected to be rounded to 1 decimal.
  */
 function calculateBill(units) {
     if (units <= 0) {
         return { 
             total: 0, 
-            breakdown: "No units consumed" 
+            breakdown: [] 
         };
     }
 
     const intUnits = Math.floor(units);
-    const decUnits = parseFloat((units - intUnits).toFixed(2)); // Handle precise decimals
+    const decUnits = parseFloat((units - intUnits).toFixed(2));
 
     let total = 0;
     let breakdown = [];
@@ -98,7 +96,7 @@ function calculateBill(units) {
         const slab1Units = Math.min(intUnits, 10);
         const slab1Cost = slab1Units * 65;
         total += slab1Cost;
-        breakdown.push(`${slab1Units} units @ Rs 65 = Rs ${slab1Cost}`);
+        breakdown.push(`Slab 1 (${slab1Units}): ${slab1Cost}`);
     }
 
     // 2. Remaining units (> 10)
@@ -106,24 +104,30 @@ function calculateBill(units) {
         const slab2Units = intUnits - 10;
         const slab2Cost = slab2Units * 70;
         total += slab2Cost;
-        breakdown.push(`${slab2Units} units @ Rs 70 = Rs ${slab2Cost}`);
+        breakdown.push(`Slab 2 (${slab2Units}): ${slab2Cost}`);
     }
 
     // 3. Decimal units
     if (decUnits > 0) {
-        // User Request: 0.8 units should be Rs 48.
-        // Math calculation: 48 / 0.8 = 60.
-        // Therefore, the decimal rate is set to Rs 60.
-        const decRate = 60;
+        const decRate = 60; 
         const decCost = decUnits * decRate;
         total += decCost;
-        breakdown.push(`${decUnits} units @ Rs ${decRate} = Rs ${decCost.toFixed(2)}`);
+        breakdown.push(`Decimal (${decUnits}): ${decCost.toFixed(2)}`);
     }
 
     return { 
         total: parseFloat(total.toFixed(2)), 
-        breakdown: breakdown.join(" + ") 
+        breakdown: breakdown 
     };
+}
+
+// Fine State Variable
+let currentFineAmount = 0; 
+
+// Function to set the fine amount and recalculate
+function setFine(amount) {
+    currentFineAmount = amount;
+    previewCalculation();
 }
 
 // --- 4. ADMIN DASHBOARD ---
@@ -182,6 +186,9 @@ function openBillingModal(customerId) {
     document.getElementById('modal-month').value = monthStr;
     document.getElementById('modal-present-units').value = '';
     
+    // Reset Fine State
+    currentFineAmount = 0;
+
     // Reset preview
     document.getElementById('preview-total').textContent = "Rs 0.00";
     document.getElementById('calc-breakdown').innerHTML = '<p class="text-gray-400 italic">Enter units to preview...</p>';
@@ -209,14 +216,69 @@ function previewCalculation() {
         document.getElementById('preview-total').classList.remove('text-red-500');
     }
 
-    const consumed = presentUnits - prevUnits;
+    // Calculate consumed units and force exactly 1 decimal place
+    let consumed = presentUnits - prevUnits;
+    consumed = parseFloat(consumed.toFixed(1));
     
-    // Calculate using the new logic
-    const result = calculateBill(consumed);
+    // 1. Calculate Monthly Use (Water Bill)
+    const waterBillResult = calculateBill(consumed);
+    
+    // 2. Maintain Cost (Fixed)
+    const maintainCost = 250;
+    
+    // 3. Fine Amount (Now variable: 0, 0.5, or 200)
+    const fineCost = currentFineAmount;
+
+    // 4. Total Calculation
+    const grandTotal = waterBillResult.total + maintainCost + fineCost;
+
+    // Construct Breakdown HTML
+    let html = `<div class="text-xs text-gray-500 mb-2 border-b border-blue-100 pb-1">Consumed: <b class="text-blue-700">${consumed} units</b></div>`;
+    
+    // Show breakdown details (compact)
+    if(waterBillResult.breakdown.length > 0) {
+        html += `<div class="text-xs text-gray-400 mb-2">(${waterBillResult.breakdown.join(', ')})</div>`;
+    }
+
+    html += `<div class="flex justify-between text-sm mb-1 items-center"><span>Monthly Use:</span> <span class="font-medium">Rs ${waterBillResult.total.toFixed(2)}</span></div>`;
+    html += `<div class="flex justify-between text-sm mb-1 items-center"><span>Maintain Cost:</span> <span class="font-medium">Rs ${maintainCost.toFixed(2)}</span></div>`;
+
+    // Fine Buttons Section
+    // Define available fine options
+    const fineOptions = [
+        { val: 0, label: "No Fine" },
+        { val: 50, label: "Rs 50.0" },
+        { val: 200, label: "Rs 200.00" }
+    ];
+
+    html += `<div class="mt-3 pt-2 border-t border-blue-200">
+        <div class="text-sm text-gray-700 font-semibold mb-2">Fine Amount:</div>
+        <div class="flex gap-2">`;
+    
+    fineOptions.forEach(opt => {
+        // Style logic: If this option is selected, make it Red. If not, Gray.
+        const isActive = (currentFineAmount === opt.val);
+        const btnClass = isActive 
+            ? "bg-red-500 text-white shadow-md scale-105" 
+            : "bg-gray-100 text-gray-600 hover:bg-gray-200";
+        
+        html += `<button onclick="setFine(${opt.val})" class="${btnClass} px-3 py-1 rounded text-xs font-bold transition-all duration-200 border border-transparent">
+            ${opt.label}
+        </button>`;
+    });
+
+    html += `</div>`;
+
+    // Show added fine if any
+    if (fineCost > 0) {
+        html += `<div class="flex justify-between text-sm text-red-600 mt-2 pl-2 font-medium"><span>Added Fine:</span> <span>+ Rs ${fineCost.toFixed(2)}</span></div>`;
+    }
+
+    html += `</div>`; // End fine section
 
     // Update UI
-    document.getElementById('calc-breakdown').innerHTML = `<div class="text-xs text-gray-500">Consumed: <b>${consumed} units</b></div><div class="mt-1">${result.breakdown}</div>`;
-    document.getElementById('preview-total').textContent = `Rs ${result.total.toFixed(2)}`;
+    document.getElementById('calc-breakdown').innerHTML = html;
+    document.getElementById('preview-total').textContent = `Rs ${grandTotal.toFixed(2)}`;
 }
 
 function handleBillingSubmit(e) {
@@ -231,8 +293,14 @@ function handleBillingSubmit(e) {
         return;
     }
 
-    const consumed = presentUnits - prevUnits;
-    const result = calculateBill(consumed);
+    // Recalculate exactly as previewed
+    let consumed = presentUnits - prevUnits;
+    consumed = parseFloat(consumed.toFixed(1));
+    
+    const waterBill = calculateBill(consumed).total;
+    const maintainCost = 250;
+    const fineCost = currentFineAmount; // Uses current selected fine
+    const finalTotal = waterBill + maintainCost + fineCost;
 
     // Save Bill
     const newBill = {
@@ -242,7 +310,7 @@ function handleBillingSubmit(e) {
         presentUnits,
         prevUnits,
         consumed,
-        total: result.total
+        total: finalTotal
     };
 
     state.bills.push(newBill);
