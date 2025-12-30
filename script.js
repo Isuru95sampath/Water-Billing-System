@@ -1,391 +1,503 @@
-// --- 1. DATA MOCKUP (Simulating Firebase) ---
-const state = {
-    currentUser: null,
-    users: [
-        { id: 'u1', name: 'Admin User', email: 'admin@water.com', password: 'admin123', role: 'admin' },
-        { id: 'u2', name: 'John Smith', email: 'user@water.com', password: 'user123', role: 'customer', address: '123 Main St' },
-        { id: 'u3', name: 'Sarah Connor', email: 'sarah@water.com', password: 'user123', role: 'customer', address: '45 Sky Net Blvd' },
-        { id: 'u4', name: 'Mike Ross', email: 'mike@water.com', password: 'user123', role: 'customer', address: '78 Legal Ln' }
-    ],
-    bills: [
-        // History
-        { id: 'b1', customerId: 'u2', month: '2023-08', presentUnits: 100, prevUnits: 90, consumed: 10, total: 900 }, // 650+250
-        { id: 'b2', customerId: 'u2', month: '2023-09', presentUnits: 1132.1, prevUnits: 100, consumed: 12.1, total: 1146 }, // (650+70+6) + 250
-        { id: 'b3', customerId: 'u3', month: '2023-09', presentUnits: 50.5, prevUnits: 45, consumed: 5.5, total: 643 } // (325+30) + 250
-    ]
+
+// Import Firebase SDKs
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// --- CONFIGURATION ---
+const firebaseConfig = {
+    apiKey: "AIzaSyAgiS8AwDIV8quJ5xK1RhynNvdXp5GTyEw",
+    authDomain: "hydrobill-mobile.firebaseapp.com",
+    projectId: "hydrobill-mobile",
+    storageBucket: "hydrobill-mobile.firebasestorage.app",
+    messagingSenderId: "518368679428",
+    appId: "1:518368679428:web:8e7af73daaf04f77130751"
 };
 
-let currentAuthRole = 'admin';
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// --- 2. AUTHENTICATION LOGIC ---
+// --- GLOBAL STATE ---
+let currentUser = null;
+let currentRole = '';
+let currentBillCustomerId = null;
+let currentFineAmount = 0;
 
-function switchAuthTab(role) {
-    currentAuthRole = role;
-    const adminTab = document.getElementById('tab-admin');
-    const custTab = document.getElementById('tab-customer');
-    const title = document.getElementById('auth-title');
+// --- UI UTILITIES ---
 
-    if (role === 'admin') {
-        adminTab.className = "flex-1 py-4 text-center font-semibold text-blue-600 border-b-2 border-blue-600 bg-blue-50 transition";
-        custTab.className = "flex-1 py-4 text-center font-semibold text-gray-500 hover:text-blue-500 transition";
-        title.textContent = "Admin Login";
-    } else {
-        custTab.className = "flex-1 py-4 text-center font-semibold text-blue-600 border-b-2 border-blue-600 bg-blue-50 transition";
-        adminTab.className = "flex-1 py-4 text-center font-semibold text-gray-500 hover:text-blue-500 transition";
-        title.textContent = "Customer Login";
-    }
+function toggleLoader(show) {
+    const loader = document.getElementById('loader');
+    if (show) loader.classList.remove('hidden');
+    else loader.classList.add('hidden');
 }
 
-function handleLogin(e) {
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-green-500 text-xl"></i>' : '<i class="fa-solid fa-circle-exclamation text-red-500 text-xl"></i>';
+    
+    toast.innerHTML = `
+        <div class="flex items-center gap-3">
+            ${icon}
+            <div>
+                <h4 class="font-bold text-slate-800 text-sm">${type === 'success' ? 'Success' : 'Error'}</h4>
+                <p class="text-slate-500 text-xs">${message}</p>
+            </div>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-slate-300 hover:text-slate-500"><i class="fa-solid fa-xmark"></i></button>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+// --- NAVIGATION & VIEW MANAGEMENT ---
+
+function hideAllViews() {
+    ['auth-section', 'admin-dashboard', 'customer-dashboard'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    ['view-role-select', 'view-login', 'view-register'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+}
+
+function showAuth() {
+    hideAllViews();
+    document.getElementById('auth-section').classList.remove('hidden');
+    document.getElementById('view-role-select').classList.remove('hidden');
+}
+
+window.resetToStart = () => {
+    currentRole = '';
+    showAuth();
+};
+
+window.selectRole = (role) => {
+    currentRole = role;
+    hideAllViews();
+    document.getElementById('auth-section').classList.remove('hidden');
+    document.getElementById('view-login').classList.remove('hidden');
+    
+    // Update text based on role
+    document.getElementById('login-title').textContent = role === 'admin' ? 'Admin Login' : 'Customer Login';
+    document.getElementById('login-subtitle').textContent = role === 'admin' ? 'Manage system access' : 'View your water bills';
+    document.getElementById('register-subtitle').textContent = role === 'admin' ? 'Create admin account' : 'Create customer account';
+};
+
+window.toggleAuthMode = (mode) => {
+    if (mode === 'register') {
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('view-register').classList.remove('hidden');
+    } else {
+        document.getElementById('view-register').classList.add('hidden');
+        document.getElementById('view-login').classList.remove('hidden');
+    }
+};
+
+// --- AUTH LOGIC ---
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        toggleLoader(true);
+        try {
+            const q = query(collection(db, "users"), where("uid", "==", user.uid));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                const userData = querySnapshot.docs[0].data();
+                toggleLoader(false);
+                
+                hideAllViews();
+                if (userData.role === 'admin') {
+                    initAdminDashboard();
+                } else {
+                    initCustomerDashboard(userData);
+                }
+            } else {
+                toggleLoader(false);
+                showToast("User record not found in database", "error");
+                signOut(auth);
+            }
+        } catch (error) {
+            toggleLoader(false);
+            console.error(error);
+            showToast("Data fetch error", "error");
+        }
+    } else {
+        // User is logged out
+        toggleLoader(false);
+        if (!document.getElementById('auth-section').classList.contains('hidden')) {
+            // Already in auth section, do nothing
+        } else {
+            // If dashboards are visible, go to auth
+            showAuth();
+        }
+    }
+});
+
+window.handleLogin = async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
+    
+    toggleLoader(true);
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // Listener handles redirect
+    } catch (error) {
+        toggleLoader(false);
+        showToast("Login Failed: " + error.message, "error");
+    }
+};
 
-    const user = state.users.find(u => u.email === email && u.password === password);
+window.handleRegister = async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+    
+    toggleLoader(true);
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
 
-    if (user) {
-        if (user.role !== currentAuthRole) {
-            showToast(`Please use the ${user.role} sign-in tab.`, 'error');
-            return;
-        }
-        state.currentUser = user;
-        showToast(`Welcome back, ${user.name}!`, 'success');
+        await setDoc(doc(db, "users", uid), {
+            uid: uid,
+            name: name,
+            email: email,
+            role: currentRole,
+            createdAt: new Date()
+        });
+
+        // Force logout to ensure clean session
+        await signOut(auth);
+        toggleLoader(false);
+
+        showToast("Account created! Please log in.");
         
-        document.getElementById('login-view').classList.add('hidden');
-        if (user.role === 'admin') {
-            initAdminDashboard();
-        } else {
-            initCustomerDashboard();
-        }
-    } else {
-        showToast("Invalid email or password.", 'error');
+        // Reset form and show Login screen automatically
+        document.getElementById('view-register').classList.add('hidden');
+        document.getElementById('view-login').classList.remove('hidden');
+        e.target.reset();
+
+    } catch (error) {
+        toggleLoader(false);
+        showToast("Registration Error: " + error.message, "error");
     }
-}
+};
 
-function logout() {
-    state.currentUser = null;
-    document.getElementById('login-form').reset();
-    document.getElementById('admin-view').classList.add('hidden');
-    document.getElementById('customer-view').classList.add('hidden');
-    document.getElementById('login-view').classList.remove('hidden');
-    showToast("Logged out successfully.", 'info');
-}
-
-// --- 3. BILLING LOGIC ---
-
-/**
- * Calculates the water usage cost only.
- * Input units expected to be rounded to 1 decimal.
- */
-function calculateBill(units) {
-    if (units <= 0) {
-        return { 
-            total: 0, 
-            breakdown: [] 
-        };
+window.logout = async () => {
+    try {
+        await signOut(auth);
+        window.location.reload(); // Clean reload
+    } catch (error) {
+        console.error(error);
     }
+};
 
-    const intUnits = Math.floor(units);
-    const decUnits = parseFloat((units - intUnits).toFixed(2));
-
-    let total = 0;
-    let breakdown = [];
-
-    // 1. First 10 units
-    if (intUnits > 0) {
-        const slab1Units = Math.min(intUnits, 10);
-        const slab1Cost = slab1Units * 65;
-        total += slab1Cost;
-        breakdown.push(`Slab 1 (${slab1Units}): ${slab1Cost}`);
-    }
-
-    // 2. Remaining units (> 10)
-    if (intUnits > 10) {
-        const slab2Units = intUnits - 10;
-        const slab2Cost = slab2Units * 70;
-        total += slab2Cost;
-        breakdown.push(`Slab 2 (${slab2Units}): ${slab2Cost}`);
-    }
-
-    // 3. Decimal units
-    if (decUnits > 0) {
-        const decRate = 60; 
-        const decCost = decUnits * decRate;
-        total += decCost;
-        breakdown.push(`Decimal (${decUnits}): ${decCost.toFixed(2)}`);
-    }
-
-    return { 
-        total: parseFloat(total.toFixed(2)), 
-        breakdown: breakdown 
-    };
-}
-
-// Fine State Variable
-let currentFineAmount = 0; 
-
-// Function to set the fine amount and recalculate
-function setFine(amount) {
-    currentFineAmount = amount;
-    previewCalculation();
-}
-
-// --- 4. ADMIN DASHBOARD ---
+// --- ADMIN FUNCTIONS ---
 
 function initAdminDashboard() {
-    document.getElementById('admin-view').classList.remove('hidden');
+    document.getElementById('admin-dashboard').classList.remove('hidden');
     renderCustomerTable();
 }
 
-function renderCustomerTable() {
+window.renderCustomerTable = async () => {
     const tbody = document.getElementById('customer-table-body');
-    const searchTerm = document.getElementById('admin-search').value.toLowerCase();
+    const search = document.getElementById('admin-search').value.toLowerCase();
+    const noData = document.getElementById('no-customers-msg');
     tbody.innerHTML = '';
 
-    const customers = state.users.filter(u => u.role === 'customer' && u.name.toLowerCase().includes(searchTerm));
-    document.getElementById('total-customers-count').textContent = customers.length;
+    try {
+        const q = query(collection(db, "users"), where("role", "==", "customer"));
+        const querySnapshot = await getDocs(q);
+        
+        document.getElementById('total-customers-count').textContent = querySnapshot.size;
+        
+        let count = 0;
+        querySnapshot.forEach((docSnap) => {
+            const c = docSnap.data();
+            if (c.name.toLowerCase().includes(search) || c.email.toLowerCase().includes(search)) {
+                count++;
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                const safeName = c.name.replace(/'/g, "\\'");
+                tr.innerHTML = `
+                    <td class="p-5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                                ${c.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-800">${c.name}</div>
+                                <div class="text-xs text-slate-500">${c.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-5 hidden sm:table-cell">
+                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Active</span>
+                    </td>
+                    <td class="p-5 text-right">
+                        <button onclick="window.openBillingModal('${c.uid}', '${safeName}')" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition">
+                            <i class="fa-solid fa-file-invoice mr-1"></i> Bill
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        });
 
-    customers.forEach(customer => {
-        const customerBills = state.bills.filter(b => b.customerId === customer.id);
-        customerBills.sort((a, b) => b.month.localeCompare(a.month));
-        const lastBill = customerBills[0];
-        const lastReading = lastBill ? lastBill.presentUnits : 0;
-        const status = lastBill ? 'Active' : 'New';
+        if (count === 0) noData.classList.remove('hidden');
+        else noData.classList.add('hidden');
 
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-gray-50 border-b border-gray-100 transition";
-        tr.innerHTML = `
-            <td class="p-4"><div class="font-medium text-gray-800">${customer.name}</div><div class="text-xs text-gray-500">ID: ${customer.id}</div></td>
-            <td class="p-4 text-gray-600">${customer.email}</td>
-            <td class="p-4 font-mono text-blue-600">${lastReading}</td>
-            <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">${status}</span></td>
-            <td class="p-4 text-right"><button onclick="openBillingModal('${customer.id}')" class="text-blue-600 hover:text-blue-800 font-medium text-sm bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded transition"><i class="fa-solid fa-file-invoice mr-1"></i> Add Bill</button></td>
-        `;
-        tbody.appendChild(tr);
-    });
+    } catch (error) {
+        console.error(error);
+        showToast("Failed to load customers", "error");
+    }
+};
+
+window.openAddCustomerModal = () => {
+    document.getElementById('customer-modal').classList.remove('hidden');
+    document.getElementById('customer-modal').classList.add('flex');
+};
+
+window.closeAddCustomerModal = () => {
+    document.getElementById('customer-modal').classList.add('hidden');
+    document.getElementById('customer-modal').classList.remove('flex');
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-email').value = '';
+    document.getElementById('new-pass').value = '';
+};
+
+window.handleAddCustomer = async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('new-name').value;
+    const email = document.getElementById('new-email').value;
+    const password = document.getElementById('new-pass').value;
+
+    toggleLoader(true);
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+        
+        await setDoc(doc(db, "users", uid), {
+            uid: uid,
+            name: name,
+            email: email,
+            role: 'customer',
+            createdAt: new Date()
+        });
+        
+        // Logout the admin from the newly created user session immediately
+        await signOut(auth);
+        // Re-login admin? No, simple approach: Just close modal and refresh table
+        // Since we created user, we are logged in as that user now. We need to force login admin back.
+        // For simplicity in this snippet, we alert success and reload page to force login.
+        
+        toggleLoader(false);
+        closeAddCustomerModal();
+        showToast("Customer Added. System reloading to secure session...");
+        setTimeout(() => window.location.reload(), 2000);
+        
+    } catch (error) {
+        toggleLoader(false);
+        showToast(error.message, "error");
+    }
+};
+
+// --- BILLING LOGIC ---
+
+function calculateBill(units) {
+    if (units <= 0) return 0;
+    const intUnits = Math.floor(units);
+    const decUnits = parseFloat((units - intUnits).toFixed(2));
+    let total = 0;
+    
+    // First 10 units: 65
+    total += Math.min(intUnits, 10) * 65;
+    
+    // Above 10 units: 70
+    if (intUnits > 10) total += (intUnits - 10) * 70;
+    
+    // Decimals: 60
+    if (decUnits > 0) total += decUnits * 60;
+    
+    return parseFloat(total.toFixed(2));
 }
 
-// --- 5. MODAL & BILLING SUBMIT ---
-
-function openBillingModal(customerId) {
-    const customer = state.users.find(u => u.id === customerId);
-    if (!customer) return;
-
-    document.getElementById('modal-customer-id').value = customer.id;
-    document.getElementById('modal-customer-name').textContent = customer.name;
+window.openBillingModal = async (customerId, customerName) => {
+    currentBillCustomerId = customerId;
+    document.getElementById('modal-customer-id').value = customerId;
+    document.getElementById('modal-customer-name').textContent = customerName;
     
-    const bills = state.bills.filter(b => b.customerId === customerId);
+    // Fetch last reading
+    const q = query(collection(db, "bills"), where("customerId", "==", customerId));
+    const querySnapshot = await getDocs(q);
+    let lastUnits = 0;
+    let bills = [];
+    
+    querySnapshot.forEach(d => bills.push(d.data()));
+    // Sort by month descending
     bills.sort((a, b) => b.month.localeCompare(a.month));
-    const prevBill = bills[0];
     
-    const prevUnits = prevBill ? prevBill.presentUnits : 0;
-    document.getElementById('modal-prev-units').value = prevUnits;
-    
-    const now = new Date();
-    const monthStr = now.toISOString().slice(0, 7); 
-    document.getElementById('modal-month').value = monthStr;
+    if (bills.length > 0) {
+        lastUnits = bills[0].presentUnits;
+    }
+
+    document.getElementById('modal-prev-units').value = lastUnits;
+    document.getElementById('modal-month').value = new Date().toISOString().slice(0, 7);
     document.getElementById('modal-present-units').value = '';
     
-    // Reset Fine State
+    // Set Fine
     currentFineAmount = 0;
-
-    // Reset preview
-    document.getElementById('preview-total').textContent = "Rs 0.00";
-    document.getElementById('calc-breakdown').innerHTML = '<p class="text-gray-400 italic">Enter units to preview...</p>';
-
+    
     document.getElementById('billing-modal').classList.remove('hidden');
     document.getElementById('billing-modal').classList.add('flex');
-    document.getElementById('modal-present-units').focus();
-}
+    
+    window.previewCalculation();
+};
 
-function closeModal() {
+window.closeBillingModal = () => {
     document.getElementById('billing-modal').classList.add('hidden');
     document.getElementById('billing-modal').classList.remove('flex');
-}
+    document.getElementById('billing-form').reset();
+};
 
-function previewCalculation() {
-    const prevUnits = parseFloat(document.getElementById('modal-prev-units').value) || 0;
-    const presentUnits = parseFloat(document.getElementById('modal-present-units').value) || 0;
+window.setFine = (amount) => {
+    currentFineAmount = amount;
+    window.previewCalculation();
+};
 
-    if (presentUnits < prevUnits) {
-        document.getElementById('preview-total').textContent = "Error: Present < Prev";
-        document.getElementById('preview-total').classList.add('text-red-500');
-        document.getElementById('calc-breakdown').innerHTML = '<span class="text-red-500">Present reading must be higher.</span>';
+window.previewCalculation = () => {
+    const prev = parseFloat(document.getElementById('modal-prev-units').value) || 0;
+    const pres = parseFloat(document.getElementById('modal-present-units').value) || 0;
+    const breakdown = document.getElementById('calc-breakdown');
+    const fineContainer = document.getElementById('fine-buttons');
+
+    if (pres < prev) {
+        breakdown.innerHTML = `<div class="text-red-500 font-bold text-center">New reading cannot be less than previous!</div>`;
+        document.getElementById('preview-total').textContent = "---";
         return;
-    } else {
-        document.getElementById('preview-total').classList.remove('text-red-500');
     }
 
-    // Calculate consumed units and force exactly 1 decimal place
-    let consumed = presentUnits - prevUnits;
-    consumed = parseFloat(consumed.toFixed(1));
-    
-    // 1. Calculate Monthly Use (Water Bill)
-    const waterBillResult = calculateBill(consumed);
-    
-    // 2. Maintain Cost (Fixed)
-    const maintainCost = 250;
-    
-    // 3. Fine Amount (Now variable: 0, 0.5, or 200)
-    const fineCost = currentFineAmount;
+    const consumed = parseFloat((pres - prev).toFixed(2));
+    const waterCost = calculateBill(consumed);
+    const maintain = 250;
+    const total = waterCost + maintain + currentFineAmount;
 
-    // 4. Total Calculation
-    const grandTotal = waterBillResult.total + maintainCost + fineCost;
+    breakdown.innerHTML = `
+        <div class="flex justify-between text-slate-600"><span>Consumed Units:</span> <span class="font-bold">${consumed}</span></div>
+        <div class="flex justify-between text-slate-600"><span>Water Charge:</span> <span>Rs ${waterCost.toFixed(2)}</span></div>
+        <div class="flex justify-between text-slate-600"><span>Maintenance:</span> <span>Rs ${maintain}.00</span></div>
+        <div class="flex justify-between text-red-500 font-bold border-t border-slate-200 pt-2 mt-1"><span>Fine:</span> <span>Rs ${currentFineAmount.toFixed(2)}</span></div>
+    `;
 
-    // Construct Breakdown HTML
-    let html = `<div class="text-xs text-gray-500 mb-2 border-b border-blue-100 pb-1">Consumed: <b class="text-blue-700">${consumed} units</b></div>`;
-    
-    // Show breakdown details (compact)
-    if(waterBillResult.breakdown.length > 0) {
-        html += `<div class="text-xs text-gray-400 mb-2">(${waterBillResult.breakdown.join(', ')})</div>`;
-    }
-
-    html += `<div class="flex justify-between text-sm mb-1 items-center"><span>Monthly Use:</span> <span class="font-medium">Rs ${waterBillResult.total.toFixed(2)}</span></div>`;
-    html += `<div class="flex justify-between text-sm mb-1 items-center"><span>Maintain Cost:</span> <span class="font-medium">Rs ${maintainCost.toFixed(2)}</span></div>`;
-
-    // Fine Buttons Section
-    // Define available fine options
-    const fineOptions = [
-        { val: 0, label: "No Fine" },
-        { val: 50, label: "Rs 50.0" },
-        { val: 200, label: "Rs 200.00" }
-    ];
-
-    html += `<div class="mt-3 pt-2 border-t border-blue-200">
-        <div class="text-sm text-gray-700 font-semibold mb-2">Fine Amount:</div>
-        <div class="flex gap-2">`;
-    
-    fineOptions.forEach(opt => {
-        // Style logic: If this option is selected, make it Red. If not, Gray.
-        const isActive = (currentFineAmount === opt.val);
-        const btnClass = isActive 
-            ? "bg-red-500 text-white shadow-md scale-105" 
-            : "bg-gray-100 text-gray-600 hover:bg-gray-200";
-        
-        html += `<button onclick="setFine(${opt.val})" class="${btnClass} px-3 py-1 rounded text-xs font-bold transition-all duration-200 border border-transparent">
-            ${opt.label}
-        </button>`;
+    // Generate Fine Buttons
+    fineContainer.innerHTML = '';
+    [0, 50, 200, 500].forEach(f => {
+        const btn = document.createElement('button');
+        const isActive = currentFineAmount === f;
+        btn.className = `flex-1 py-2 text-xs font-bold rounded-lg border transition ${isActive ? 'bg-red-500 text-white border-red-500' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`;
+        btn.textContent = `Rs ${f}`;
+        btn.onclick = () => window.setFine(f);
+        fineContainer.appendChild(btn);
     });
 
-    html += `</div>`;
+    document.getElementById('preview-total').textContent = "Rs " + total.toFixed(2);
+};
 
-    // Show added fine if any
-    if (fineCost > 0) {
-        html += `<div class="flex justify-between text-sm text-red-600 mt-2 pl-2 font-medium"><span>Added Fine:</span> <span>+ Rs ${fineCost.toFixed(2)}</span></div>`;
-    }
-
-    html += `</div>`; // End fine section
-
-    // Update UI
-    document.getElementById('calc-breakdown').innerHTML = html;
-    document.getElementById('preview-total').textContent = `Rs ${grandTotal.toFixed(2)}`;
-}
-
-function handleBillingSubmit(e) {
+window.handleBillingSubmit = async (e) => {
     e.preventDefault();
-    const customerId = document.getElementById('modal-customer-id').value;
-    const prevUnits = parseFloat(document.getElementById('modal-prev-units').value);
-    const presentUnits = parseFloat(document.getElementById('modal-present-units').value);
-    const month = document.getElementById('modal-month').value;
-
-    if (presentUnits < prevUnits) {
-        showToast("Present reading cannot be less than previous reading.", "error");
+    const prev = parseFloat(document.getElementById('modal-prev-units').value);
+    const pres = parseFloat(document.getElementById('modal-present-units').value);
+    
+    if (pres < prev) {
+        showToast("Invalid reading", "error");
         return;
     }
 
-    // Recalculate exactly as previewed
-    let consumed = presentUnits - prevUnits;
-    consumed = parseFloat(consumed.toFixed(1));
+    toggleLoader(true);
+    const consumed = parseFloat((pres - prev).toFixed(2));
+    const waterCost = calculateBill(consumed);
+    const month = document.getElementById('modal-month').value;
+    const total = waterCost + 250 + currentFineAmount;
+
+    try {
+        await addDoc(collection(db, "bills"), {
+            customerId: currentBillCustomerId,
+            month: month,
+            prevUnits: prev,
+            presentUnits: pres,
+            consumed: consumed,
+            waterCost: waterCost,
+            fineAmount: currentFineAmount,
+            total: total,
+            createdAt: new Date()
+        });
+        
+        toggleLoader(false);
+        showToast("Bill generated successfully!");
+        closeBillingModal();
+        // Refresh table if needed (though not strictly required for admin view)
+    } catch (error) {
+        toggleLoader(false);
+        showToast("Error saving bill: " + error.message, "error");
+    }
+};
+
+// --- CUSTOMER FUNCTIONS ---
+
+function initCustomerDashboard(userData) {
+    document.getElementById('customer-dashboard').classList.remove('hidden');
+    document.getElementById('customer-name-display').textContent = userData.name;
+    document.getElementById('c-name-display').textContent = userData.name;
+    document.getElementById('c-email-display').textContent = userData.email;
+
+    loadCustomerBills();
+}
+
+async function loadCustomerBills() {
+    const q = query(collection(db, "bills"), where("customerId", "==", currentUser.uid));
+    const querySnapshot = await getDocs(q);
+    const tbody = document.getElementById('bill-history-body');
+    const noData = document.getElementById('no-bills-msg');
+    tbody.innerHTML = '';
     
-    const waterBill = calculateBill(consumed).total;
-    const maintainCost = 250;
-    const fineCost = currentFineAmount; // Uses current selected fine
-    const finalTotal = waterBill + maintainCost + fineCost;
-
-    // Save Bill
-    const newBill = {
-        id: 'b' + Date.now(),
-        customerId,
-        month,
-        presentUnits,
-        prevUnits,
-        consumed,
-        total: finalTotal
-    };
-
-    state.bills.push(newBill);
-    showToast("Bill saved successfully!", "success");
-    closeModal();
-    renderCustomerTable();
-}
-
-// --- 6. CUSTOMER DASHBOARD ---
-
-function initCustomerDashboard() {
-    document.getElementById('customer-view').classList.remove('hidden');
-    const user = state.currentUser;
-    document.getElementById('customer-name-display').textContent = user.name;
-    document.getElementById('c-id').textContent = user.id;
-    document.getElementById('c-email').textContent = user.email;
-    renderCustomerHistory(user.id);
-}
-
-function renderCustomerHistory(customerId) {
-    let bills = state.bills.filter(b => b.customerId === customerId);
+    let bills = [];
+    querySnapshot.forEach(doc => bills.push(doc.data()));
+    
+    // Sort by month desc
     bills.sort((a, b) => b.month.localeCompare(a.month));
 
-    const tbody = document.getElementById('bill-history-body');
-    tbody.innerHTML = '';
-
-    if (bills.length === 0) {
-        document.getElementById('no-bills-msg').classList.remove('hidden');
-        document.getElementById('current-bill-amount').textContent = "Rs 0.00";
-        document.getElementById('current-units-consumed').textContent = "0";
-        return;
-    }
-
-    document.getElementById('no-bills-msg').classList.add('hidden');
-
-    const currentBill = bills[0];
-    document.getElementById('current-bill-amount').textContent = `Rs ${currentBill.total.toFixed(2)}`;
-    document.getElementById('current-units-consumed').textContent = currentBill.consumed;
-
-    bills.forEach((bill, index) => {
-        const tr = document.createElement('tr');
-        if(index === 0) tr.className = "bg-blue-50/50";
+    if (bills.length > 0) {
+        document.getElementById('current-bill-amount').textContent = "Rs " + bills[0].total.toFixed(2);
         
-        const dateObj = new Date(bill.month + "-01");
-        const monthName = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
-
-        tr.innerHTML = `
-            <td class="p-4 font-medium text-gray-800">${monthName}</td>
-            <td class="p-4 text-gray-600">${bill.prevUnits}</td>
-            <td class="p-4 text-gray-600">${bill.presentUnits}</td>
-            <td class="p-4"><span class="px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs font-bold">${bill.consumed}</span></td>
-            <td class="p-4 text-right font-bold text-blue-600">Rs ${bill.total.toFixed(2)}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-// --- UTILS ---
-
-function showToast(message, type = 'info') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    
-    let bgClass, icon;
-    if (type === 'success') { bgClass = 'bg-green-500'; icon = '<i class="fa-solid fa-check-circle"></i>'; }
-    else if (type === 'error') { bgClass = 'bg-red-500'; icon = '<i class="fa-solid fa-circle-exclamation"></i>'; }
-    else { bgClass = 'bg-gray-800'; icon = '<i class="fa-solid fa-info-circle"></i>'; }
-
-    toast.className = `${bgClass} text-white ${type}`;
-    toast.innerHTML = `${icon} <span>${message}</span>`;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.animation = 'slideIn 0.3s ease-in reverse forwards';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+        bills.forEach(bill => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50 transition";
+            tr.innerHTML = `
+                <td class="p-4 font-medium text-slate-800">${bill.month}</td>
+                <td class="p-4 text-slate-600">${bill.consumed} Units</td>
+                <td class="p-4 text-center">
+                    ${bill.fineAmount > 0 ? `<span class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold">Rs ${bill.fineAmount}</span>` : '<span class="text-slate-300">-</span>'}
+                </td>
+                <td class="p-4 text-right font-bold text-slate-800">Rs ${bill.total.toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        noData.classList.add('hidden');
+    } else {
+        document.getElementById('current-bill-amount').textContent = "Rs 0.00";
+        noData.classList.remove('hidden');
+    }
 }
