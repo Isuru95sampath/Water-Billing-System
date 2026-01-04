@@ -2,600 +2,306 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>HydroBill - Professional Billing</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- jsPDF for Report Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* Core Utility */
+        /* --- CORE STYLES --- */
         .hidden { display: none !important; }
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-tap-highlight-color: transparent;
-            min-height: 100vh;
+            height: 100vh;
+            height: 100dvh; 
+            overflow: hidden; 
         }
 
-        /* Enhanced Animations */
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
-        .slide-up { animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .slide-down { animation: slideDown 0.5s ease-out forwards; }
-        .scale-in { animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .pulse-soft { animation: pulseSoft 2s infinite; }
-        .float { animation: float 3s ease-in-out infinite; }
-        .glow { animation: glow 2s ease-in-out infinite; }
+        /* --- ANIMATIONS --- */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        
+        @keyframes slideUpMobile { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .slide-up-mobile { animation: slideUpMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        @keyframes pulseSoft { 0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); } 50% { box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         @keyframes slideLeft { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); } 50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.8); } }
+        @keyframes slideUpToast { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Glass Morphism */
+        /* --- UI ELEMENTS --- */
         .glass {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255,255, 0.95);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2);
         }
 
-        .glass-dark {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Status Badges */
         .status-badge {
-            padding: 6px 14px;
+            padding: 4px 12px;
             border-radius: 9999px;
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            letter-spacing: 0.05em;
         }
-        .status-unpaid { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #dc2626; }
-        .status-paid { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); color: #16a34a; }
+        .status-unpaid { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .status-paid { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.5); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%); }
+        /* Scrollbars */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.2); border-radius: 10px; }
 
-        /* Toast Notifications */
+        /* Toast */
         #toast-container {
             position: fixed; top: 20px; right: 20px; z-index: 9999;
-            display: flex; flex-direction: column; gap: 12px;
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
         }
         .toast {
-            min-width: 320px; padding: 18px; border-radius: 16px;
-            background: white; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+            min-width: 300px; padding: 16px; border-radius: 12px;
+            background: white; box-shadow: 0 15px 30px -5px rgba(0,0,0,0.2);
             display: flex; align-items: center; justify-content: space-between;
-            animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            border-left: 5px solid #6366f1;
+            pointer-events: auto; border-left: 4px solid #6366f1;
+            animation: slideLeft 0.4s ease-out;
         }
         .toast.success { border-left-color: #10b981; }
         .toast.error { border-left-color: #ef4444; }
 
         @media (max-width: 640px) {
-            .toast { min-width: 280px; }
-            #toast-container { right: 10px; left: 10px; }
+            #toast-container { top: auto; bottom: 20px; right: 10px; left: 10px; align-items: center; }
+            .toast { width: 100%; min-width: 0; animation: slideUpToast 0.4s ease-out; }
         }
 
-        /* Enhanced Loader */
+        /* Loader */
         .loader-overlay {
             position: fixed; inset: 0; 
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.98) 0%, rgba(118, 75, 162, 0.98) 100%);
             z-index: 10000; display: flex; justify-content: center; align-items: center;
-            backdrop-filter: blur(10px);
         }
         .spinner {
-            width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.2);
-            border-top: 6px solid #ffffff; border-radius: 50%;
+            width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2);
+            border-top: 4px solid #ffffff; border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Card Hover Effects */
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Gradient Backgrounds */
+        /* Gradients */
         .gradient-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .gradient-cyan { background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); }
-        .gradient-emerald { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .gradient-slate { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        .gradient-emerald { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
 
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            .mobile-hidden { display: none !important; }
-            .mobile-full { width: 100% !important; }
-        }
-
-        /* Button Effects */
+        /* Buttons */
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
+            transition: transform 0.1s ease;
         }
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        .btn-primary:active { transform: scale(0.96); }
+        
+        .btn-fine {
+            font-size: 10px; padding: 6px 10px;
+            border-radius: 6px; font-weight: 700;
+            transition: all 0.2s;
         }
-        .btn-primary:active {
-            transform: translateY(0);
-        }
+        .btn-fine:active { transform: scale(0.95); }
+        
+        /* Receipt Style */
+        .receipt-row { display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.5rem; color: #475569; }
+        .receipt-row.total { font-weight: 800; color: #1e293b; font-size: 1.1rem; border-top: 2px dashed #cbd5e1; padding-top: 0.75rem; margin-top: 0.75rem; }
+        .receipt-divider { height: 1px; background: #e2e8f0; margin: 0.75rem 0; }
+        
+        input, select { -webkit-appearance: none; }
     </style>
 </head>
-<body class="text-slate-800 h-screen flex flex-col overflow-hidden">
+<body class="text-slate-800 flex flex-col overflow-hidden bg-slate-100">
 
-    <!-- TOAST CONTAINER -->
     <div id="toast-container"></div>
     
-    <!-- LOADER -->
     <div id="loader" class="loader-overlay hidden">
         <div class="flex flex-col items-center gap-6">
             <div class="spinner"></div>
-            <div class="flex flex-col items-center gap-2">
-                <p class="text-xl font-bold text-white tracking-wide">PROCESSING</p>
-                <div class="flex gap-1">
-                    <div class="w-2 h-2 bg-white rounded-full animate-pulse" style="animation-delay: 0s;"></div>
-                    <div class="w-2 h-2 bg-white rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
-                    <div class="w-2 h-2 bg-white rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
-                </div>
-            </div>
+            <p class="text-lg font-bold text-white tracking-wide animate-pulse">PROCESSING</p>
         </div>
     </div>
 
-    <!-- AUTHENTICATION SECTION -->
-    <main id="auth-section" class="flex-grow flex items-center justify-center p-4 gradient-blue pb-24 overflow-y-auto">
-        <div class="w-full max-w-md slide-up">
-            <!-- Logo Area -->
-            <div class="text-center mb-12 float">
-                <div class="inline-flex items-center justify-center w-24 h-24 rounded-3xl glass text-indigo-600 shadow-2xl mb-6 ring-1 ring-white/30 glow">
-                    <i class="fa-solid fa-droplet text-5xl"></i>
+    <main id="auth-section" class="flex-grow flex items-center justify-center p-4 gradient-blue w-full h-full absolute inset-0 z-50 overflow-y-auto">
+        <div class="w-full max-w-md my-auto pb-10">
+            <div class="text-center mb-8 fade-in">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl glass text-indigo-600 shadow-xl mb-4 ring-2 ring-white/20">
+                    <i class="fa-solid fa-droplet text-4xl"></i>
                 </div>
-                <h1 class="text-5xl font-extrabold text-white tracking-tight mb-2">HydroBill</h1>
-                <p class="text-indigo-100 text-base font-semibold">Professional Water Management System</p>
+                <h1 class="text-4xl font-extrabold text-white tracking-tight">HydroBill</h1>
             </div>
 
-            <!-- Step 1: Role Select -->
-            <div id="view-role-select" class="glass rounded-3xl p-2 shadow-2xl scale-in">
-                <div class="p-6 text-center mb-2">
-                    <h2 class="text-xl font-bold text-slate-800 mb-1">Select Your Role</h2>
-                    <p class="text-slate-500 text-sm">Choose how you want to access the system</p>
+            <div id="view-role-select" class="glass rounded-3xl p-2 shadow-2xl scale-in mx-2">
+                <div class="p-4 text-center">
+                    <h2 class="text-lg font-bold text-slate-800">Select Your Role</h2>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
-                    <button onclick="window.selectRole('admin')" class="flex flex-col items-center justify-center p-8 rounded-2xl border-3 border-transparent hover:border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 transition-all duration-300 group card-hover">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
-                            <i class="fa-solid fa-user-shield text-3xl text-white"></i>
-                        </div>
-                        <span class="font-bold text-slate-800 text-lg">Admin</span>
-                        <span class="text-slate-500 text-xs mt-1">System Management</span>
+                <div class="grid grid-cols-1 gap-3 p-3">
+                    <button onclick="window.selectRole('admin')" class="flex items-center p-4 rounded-xl bg-indigo-50/50 hover:bg-indigo-50 border border-transparent hover:border-indigo-200 transition-all active:scale-95">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center shadow-lg shrink-0"><i class="fa-solid fa-user-shield text-xl text-white"></i></div>
+                        <div class="ml-4 text-left"><span class="block font-bold text-slate-800 text-lg">Admin</span><span class="text-slate-500 text-xs">System Management</span></div>
                     </button>
-                    <button onclick="window.selectRole('customer')" class="flex flex-col items-center justify-center p-8 rounded-2xl border-3 border-transparent hover:border-cyan-500 bg-gradient-to-br from-cyan-50 to-blue-50 hover:from-cyan-100 hover:to-blue-100 transition-all duration-300 group card-hover">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
-                            <i class="fa-solid fa-user text-3xl text-white"></i>
-                        </div>
-                        <span class="font-bold text-slate-800 text-lg">Customer</span>
-                        <span class="text-slate-500 text-xs mt-1">View Bills & History</span>
+                    <button onclick="window.selectRole('customer')" class="flex items-center p-4 rounded-xl bg-cyan-50/50 hover:bg-cyan-50 border border-transparent hover:border-cyan-200 transition-all active:scale-95">
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500 flex items-center justify-center shadow-lg shrink-0"><i class="fa-solid fa-user text-xl text-white"></i></div>
+                        <div class="ml-4 text-left"><span class="block font-bold text-slate-800 text-lg">Customer</span><span class="text-slate-500 text-xs">View Bills</span></div>
                     </button>
                 </div>
             </div>
 
-            <!-- Step 2: Login -->
-            <div id="view-login" class="glass rounded-3xl p-8 shadow-2xl hidden fade-in mt-6">
-                <button onclick="window.resetToStart()" class="text-xs font-bold text-slate-500 hover:text-indigo-600 mb-8 flex items-center gap-2 uppercase tracking-wider transition-all hover:gap-3">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Role Selection
-                </button>
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-2" id="login-title">Welcome Back</h2>
-                    <p class="text-slate-500 text-sm" id="login-subtitle">Sign in to access your dashboard</p>
+            <div id="view-login" class="glass rounded-3xl p-6 md:p-8 shadow-2xl hidden fade-in mx-2">
+                <button onclick="window.resetToStart()" class="text-xs font-bold text-slate-500 hover:text-indigo-600 mb-6 flex items-center gap-2 uppercase p-2 -ml-2"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800" id="login-title">Welcome Back</h2>
+                    <p class="text-slate-500 text-sm" id="login-subtitle">Sign in to continue</p>
                 </div>
-
-                <form onsubmit="window.handleLogin(event)" class="space-y-6">
-                    <div class="relative group">
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2 ml-1">Email Address</label>
-                        <div class="relative">
-                            <i class="fa-regular fa-envelope absolute left-4 top-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                            <input type="email" id="login-email" required class="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl outline-none transition-all text-sm font-medium shadow-sm" placeholder="name@example.com">
-                        </div>
-                    </div>
-                    <div class="relative group">
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2 ml-1">Password</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-lock absolute left-4 top-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                            <input type="password" id="login-password" required class="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl outline-none transition-all text-sm font-medium shadow-sm" placeholder="••••••••">
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold shadow-xl mt-4 text-sm uppercase tracking-wider">
-                        <i class="fa-solid fa-right-to-bracket mr-2"></i> Sign In
-                    </button>
+                <form onsubmit="window.handleLogin(event)" class="space-y-4">
+                    <div class="relative"><i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="email" id="login-email" required class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Email"></div>
+                    <div class="relative"><i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="password" id="login-password" required class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Password"></div>
+                    <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold shadow-lg mt-2 text-sm uppercase tracking-wider">Sign In</button>
                 </form>
-                <div class="mt-8 text-center">
-                    <p class="text-sm text-slate-600">Don't have an account? <button onclick="window.toggleAuthMode('register')" class="text-indigo-600 font-bold hover:underline">Create Account</button></p>
-                </div>
+                <div class="mt-6 text-center"><p class="text-sm text-slate-600">No account? <button onclick="window.toggleAuthMode('register')" class="text-indigo-600 font-bold px-2 py-1">Create One</button></p></div>
             </div>
 
-            <!-- Step 3: Register -->
-            <div id="view-register" class="glass rounded-3xl p-8 shadow-2xl hidden fade-in mt-6">
-                <button onclick="window.resetToStart()" class="text-xs font-bold text-slate-500 hover:text-indigo-600 mb-8 flex items-center gap-2 uppercase tracking-wider transition-all hover:gap-3">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Role Selection
-                </button>
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-2">Create Account</h2>
-                    <p class="text-slate-500 text-sm">Join HydroBill today</p>
-                </div>
-                <form onsubmit="window.handleRegister(event)" class="space-y-6">
-                    <div class="relative group">
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2 ml-1">Full Name</label>
-                        <div class="relative">
-                            <i class="fa-regular fa-user absolute left-4 top-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                            <input type="text" id="reg-name" required class="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl outline-none transition-all text-sm font-medium shadow-sm" placeholder="John Doe">
-                        </div>
-                    </div>
-                    <div class="relative group">
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2 ml-1">Email Address</label>
-                        <div class="relative">
-                            <i class="fa-regular fa-envelope absolute left-4 top-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                            <input type="email" id="reg-email" required class="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl outline-none transition-all text-sm font-medium shadow-sm" placeholder="name@example.com">
-                        </div>
-                    </div>
-                    <div class="relative group">
-                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2 ml-1">Password</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-lock absolute left-4 top-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
-                            <input type="password" id="reg-password" required minlength="6" class="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 hover:border-slate-300 focus:border-indigo-500 focus:bg-white rounded-xl outline-none transition-all text-sm font-medium shadow-sm" placeholder="••••••••">
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full gradient-emerald text-white py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 active:translate-y-0 mt-4 text-sm uppercase tracking-wider">
-                        <i class="fa-solid fa-user-plus mr-2"></i> Create Account
-                    </button>
+            <div id="view-register" class="glass rounded-3xl p-6 md:p-8 shadow-2xl hidden fade-in mx-2">
+                <button onclick="window.resetToStart()" class="text-xs font-bold text-slate-500 hover:text-indigo-600 mb-6 flex items-center gap-2 uppercase p-2 -ml-2"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <h2 class="text-2xl font-bold text-slate-800 text-center mb-6">Create Account</h2>
+                <form onsubmit="window.handleRegister(event)" class="space-y-4">
+                    <div class="relative"><i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" id="reg-name" required class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Full Name"></div>
+                    <div class="relative"><i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="email" id="reg-email" required class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Email"></div>
+                    <div class="relative"><i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="password" id="reg-password" required minlength="6" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Password"></div>
+                    <button type="submit" class="w-full gradient-emerald text-white py-4 rounded-xl font-bold shadow-lg mt-2 text-sm uppercase tracking-wider">Create Account</button>
                 </form>
-                <div class="mt-8 text-center">
-                    <p class="text-sm text-slate-600">Already have an account? <button onclick="window.toggleAuthMode('login')" class="text-indigo-600 font-bold hover:underline">Sign In</button></p>
-                </div>
+                <div class="mt-6 text-center"><p class="text-sm text-slate-600">Has account? <button onclick="window.toggleAuthMode('login')" class="text-indigo-600 font-bold px-2 py-1">Sign In</button></p></div>
             </div>
         </div>
     </main>
 
-    <!-- ADMIN DASHBOARD -->
-    <section id="admin-dashboard" class="hidden h-full flex flex-col md:flex-row bg-slate-50 fade-in">
-        <!-- Mobile Header -->
-        <nav class="md:hidden gradient-slate text-white p-4 flex justify-between items-center shadow-xl z-30 border-b border-slate-700">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-droplet text-cyan-400 text-2xl"></i>
-                <span class="font-bold text-lg">HydroAdmin</span>
-            </div>
-            <button onclick="window.logout()" class="text-sm text-slate-300 hover:text-white bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg font-semibold transition">
-                <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
-            </button>
+    <section id="admin-dashboard" class="hidden h-full flex flex-col md:flex-row bg-slate-50 fade-in w-full">
+        <nav class="md:hidden gradient-slate text-white p-4 flex justify-between items-center shadow-lg z-30 shrink-0">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-droplet text-cyan-400 text-xl"></i><span class="font-bold text-lg">HydroAdmin</span></div>
+            <button onclick="window.logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg font-semibold border border-white/10">Logout</button>
         </nav>
 
-        <!-- Sidebar -->
-        <aside class="hidden md:flex flex-col w-80 gradient-slate text-white p-6 shadow-2xl z-20 border-r border-slate-700">
-            <div class="flex items-center gap-4 mb-12 pb-6 border-b border-slate-700">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
-                    <i class="fa-solid fa-droplet text-2xl"></i>
-                </div>
-                <div>
-                    <span class="text-2xl font-bold block">HydroAdmin</span>
-                    <span class="text-xs text-slate-400">Management Portal</span>
-                </div>
+        <aside class="hidden md:flex flex-col w-72 gradient-slate text-white p-6 shadow-2xl z-20 border-r border-slate-700">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg"><i class="fa-solid fa-droplet text-xl"></i></div>
+                <div><span class="text-xl font-bold block">HydroAdmin</span><span class="text-[10px] text-slate-400 uppercase tracking-widest">Portal</span></div>
             </div>
-            
             <div class="flex-grow space-y-3">
-                <button onclick="window.openAddCustomerModal()" class="w-full flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl text-white shadow-lg hover:shadow-xl hover:from-indigo-500 hover:to-purple-500 transition-all font-semibold text-sm group">
-                    <i class="fa-solid fa-user-plus text-lg group-hover:scale-110 transition-transform"></i> 
-                    <span>Add New Customer</span>
-                </button>
+                <button onclick="window.openAddCustomerModal()" class="w-full flex items-center gap-3 px-4 py-3 bg-indigo-600 rounded-xl text-white shadow-lg hover:bg-indigo-500 transition-all font-semibold text-sm"><i class="fa-solid fa-plus text-lg"></i> Add Customer</button>
             </div>
-            
-            <button onclick="window.logout()" class="flex items-center gap-4 px-6 py-4 text-slate-300 hover:text-white hover:bg-slate-700 rounded-xl transition-all text-sm font-semibold mt-6 border border-slate-700">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
-            </button>
+            <button onclick="window.logout()" class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all text-sm font-semibold mt-6 border-t border-slate-700"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         </aside>
 
-        <div class="flex-1 flex flex-col h-full overflow-hidden bg-slate-100">
-            <!-- Reports Section -->
-            <div class="bg-white border-b border-slate-200 p-4 md:p-8 shadow-sm z-10">
-                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                        <i class="fa-solid fa-chart-line text-white"></i>
+        <div class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 relative">
+            <div class="bg-white border-b border-slate-200 p-4 md:p-8 shadow-sm z-10 shrink-0">
+                <div class="md:hidden mb-4">
+                     <button onclick="window.openAddCustomerModal()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 rounded-xl text-white shadow font-bold text-sm active:scale-95"><i class="fa-solid fa-user-plus"></i> Add New Customer</button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-4">
+                    <div class="col-span-1 gradient-slate rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
+                        <div class="relative z-10"><p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Customers</p><h3 class="text-3xl font-bold" id="total-customers-count">0</h3></div>
+                        <i class="fa-solid fa-users absolute bottom-2 right-2 text-4xl text-white/5"></i>
                     </div>
-                    Dashboard Overview
-                </h2>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <!-- Summary Card -->
-                    <div class="gradient-slate rounded-2xl p-6 text-white shadow-xl card-hover relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-12 -mt-12"></div>
-                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-8 -mb-8"></div>
-                        <div class="relative z-10 flex justify-between items-start">
-                            <div>
-                                <p class="text-slate-300 text-xs font-bold uppercase tracking-wider mb-2">Total Customers</p>
-                                <h3 class="text-5xl font-extrabold mb-2" id="total-customers-count">0</h3>
-                                <p class="text-slate-400 text-sm">Active accounts in system</p>
-                            </div>
-                            <div class="bg-white/10 p-4 rounded-2xl backdrop-blur-sm">
-                                <i class="fa-solid fa-users text-4xl"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Report Generator -->
-                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-6 flex flex-col justify-center card-hover shadow-lg">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                                <i class="fa-solid fa-file-pdf text-white text-lg"></i>
-                            </div>
-                            <h4 class="text-indigo-900 font-bold text-lg">Generate Monthly Report</h4>
-                        </div>
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <input type="month" id="report-month" class="flex-1 bg-white border-2 border-indigo-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:border-indigo-500 transition shadow-sm">
-                            <button onclick="window.generateReport()" class="gradient-blue text-white px-6 py-3 rounded-xl font-bold text-sm hover:shadow-xl transition-all transform hover:-translate-y-1 active:translate-y-0 whitespace-nowrap">
-                                <i class="fa-solid fa-download mr-2"></i> Download PDF
-                            </button>
-                        </div>
-                        <div id="report-stats" class="mt-4 p-3 bg-white rounded-lg border border-indigo-200 text-sm text-indigo-700 font-semibold hidden">
-                            📊 Total Units in <span class="font-bold report-month-display text-indigo-900"></span>: <span id="report-total-units" class="font-bold text-indigo-900"></span>
-                        </div>
+                    <div class="col-span-1 md:col-span-2 flex flex-col md:flex-row gap-2">
+                        <input type="month" id="report-month" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-indigo-500">
+                        <button onclick="window.generateReport()" class="w-full md:w-auto bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap shadow hover:bg-slate-700 active:scale-95"><i class="fa-solid fa-download mr-1"></i> PDF</button>
                     </div>
                 </div>
-
-                <!-- Search -->
-                <div class="bg-white p-2 rounded-xl border-2 border-slate-200 flex items-center shadow-md hover:shadow-lg transition-shadow">
-                    <i class="fa-solid fa-magnifying-glass text-slate-400 ml-4 text-lg"></i>
-                    <input type="text" id="admin-search" onkeyup="window.renderCustomerTable()" placeholder="Search customers by name or email..." class="w-full p-4 outline-none text-slate-700 font-medium bg-transparent text-sm">
+                <div class="bg-slate-100 px-3 py-2 rounded-xl flex items-center border border-transparent focus-within:border-indigo-300 focus-within:bg-white transition-all">
+                    <i class="fa-solid fa-search text-slate-400 mr-2"></i>
+                    <input type="text" id="admin-search" onkeyup="window.renderCustomerTable()" placeholder="Search customers..." class="w-full bg-transparent outline-none text-sm py-1">
                 </div>
             </div>
 
-            <!-- Customer Table -->
-            <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
-                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
+            <main class="flex-1 overflow-y-auto p-4 pb-20 md:pb-8 relative">
+                <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto no-scrollbar">
                         <table class="w-full text-left border-collapse min-w-[600px]">
-                            <thead class="gradient-slate text-white text-xs uppercase font-bold tracking-wider">
-                                <tr>
-                                    <th class="p-6">Customer Details</th>
-                                    <th class="p-6 hidden sm:table-cell">Status</th>
-                                    <th class="p-6 text-right">Actions</th>
-                                </tr>
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-100">
+                                <tr><th class="p-4">Customer</th><th class="p-4 hidden sm:table-cell">Status</th><th class="p-4 text-right">Action</th></tr>
                             </thead>
                             <tbody id="customer-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
                     </div>
-                    <div id="no-customers-msg" class="hidden p-12 text-center">
-                        <i class="fa-solid fa-users-slash text-6xl text-slate-300 mb-4"></i>
-                        <p class="text-slate-400 font-semibold">No customers found</p>
-                    </div>
+                    <div id="no-customers-msg" class="hidden p-8 text-center text-slate-400"><i class="fa-solid fa-inbox text-3xl mb-2"></i><p class="text-sm">No customers found</p></div>
                 </div>
             </main>
         </div>
     </section>
 
-    <!-- CUSTOMER DASHBOARD -->
-    <section id="customer-dashboard" class="hidden h-full flex flex-col bg-slate-100 fade-in overflow-hidden">
-        <nav class="bg-white shadow-md p-4 flex justify-between items-center z-20 border-b-2 border-indigo-100">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                    <i class="fa-solid fa-droplet text-white text-lg"></i>
-                </div>
-                <span class="text-indigo-600 font-bold text-xl">HydroBill</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <span class="text-xs font-bold text-slate-600 hidden sm:block bg-slate-100 px-4 py-2 rounded-lg" id="customer-name-display">User</span>
-                <button onclick="window.logout()" class="text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-bold transition-all border border-red-200 hover:border-red-500">
-                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
-                </button>
-            </div>
+    <section id="customer-dashboard" class="hidden h-full flex flex-col bg-slate-100 fade-in overflow-hidden w-full">
+        <nav class="bg-white shadow-sm px-4 py-3 flex justify-between items-center z-20 shrink-0">
+            <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center"><i class="fa-solid fa-droplet text-white text-sm"></i></div><span class="text-slate-800 font-bold text-lg">HydroBill</span></div>
+            <div class="flex items-center gap-3"><span class="text-xs font-bold text-slate-600 hidden sm:block bg-slate-50 px-3 py-1 rounded-md" id="customer-name-display">User</span><button onclick="window.logout()" class="text-slate-500 hover:text-red-500 text-sm font-semibold px-2 py-1"><i class="fa-solid fa-right-from-bracket"></i></button></div>
         </nav>
-        <main class="flex-1 overflow-y-auto p-4 md:p-8 pb-24">
-            <div class="max-w-5xl mx-auto space-y-6">
-                <!-- Profile & Balance -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-lg border border-slate-200 card-hover">
-                        <h3 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                                <i class="fa-solid fa-id-card text-white text-sm"></i>
-                            </div>
-                            My Profile
-                        </h3>
-                        <div class="flex items-center gap-5 bg-gradient-to-br from-slate-50 to-indigo-50 p-6 rounded-xl border border-indigo-100">
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                                <i class="fa-solid fa-user"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-slate-800 text-xl mb-1" id="c-name-display">Customer Name</p>
-                                <p class="text-sm text-slate-500 flex items-center gap-2">
-                                    <i class="fa-solid fa-envelope text-xs"></i>
-                                    <span id="c-email-display">email@example.com</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gradient-blue p-6 rounded-2xl shadow-xl text-white flex flex-col justify-center relative overflow-hidden card-hover">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-12 -mt-12"></div>
-                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-8 -mb-8"></div>
-                        <div class="relative z-10">
-                            <p class="text-indigo-100 text-xs font-bold uppercase tracking-wider mb-2">Latest Bill Due</p>
-                            <h2 class="text-4xl font-extrabold mb-1" id="current-bill-amount">Rs 0.00</h2>
-                            <p class="text-indigo-200 text-xs">Current outstanding balance</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Billing History -->
-                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col overflow-hidden card-hover">
-                    <div class="p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-indigo-50 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-3 text-lg">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                                <i class="fa-solid fa-file-invoice text-white text-sm"></i>
-                            </div>
-                            Billing History
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left min-w-[400px]">
-                            <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
-                                <tr>
-                                    <th class="p-5">Month</th>
-                                    <th class="p-5">Units</th>
-                                    <th class="p-5 text-right">Total</th>
-                                    <th class="p-5 text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bill-history-body" class="divide-y divide-slate-100 text-sm"></tbody>
-                        </table>
-                        <div id="no-bills-msg" class="hidden p-12 text-center">
-                            <i class="fa-solid fa-file-circle-xmark text-6xl text-slate-300 mb-4"></i>
-                            <p class="text-slate-400 font-semibold">No billing history available</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Previous Logins -->
-                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col overflow-hidden card-hover">
-                    <div class="p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-cyan-50 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-3 text-lg">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                                <i class="fa-solid fa-clock-rotate-left text-white text-sm"></i>
-                            </div>
-                            Previous Logins
-                        </h3>
-                        <span class="text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-full font-semibold">Last 10 Sessions</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left min-w-[300px]">
-                            <thead class="bg-slate-50 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
-                                <tr>
-                                    <th class="p-5">Date & Time</th>
-                                    <th class="p-5 text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="login-history-body" class="divide-y divide-slate-100 text-sm"></tbody>
-                        </table>
-                        <div id="no-logins-msg" class="hidden p-8 text-center">
-                            <i class="fa-solid fa-clock text-4xl text-slate-300 mb-3"></i>
-                            <p class="text-slate-400 font-semibold text-sm">No login history found</p>
-                        </div>
-                    </div>
-                </div>
+        <main class="flex-1 overflow-y-auto p-4 pb-24 space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex items-center gap-4"><div class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold border border-indigo-200 shadow-inner shrink-0"><i class="fa-solid fa-user"></i></div><div class="overflow-hidden"><h2 class="text-lg font-bold text-slate-800 truncate" id="c-name-display">User</h2><p class="text-xs text-slate-500 truncate" id="c-email-display">user@example.com</p></div></div>
+            </div>
+            <div class="gradient-blue p-6 rounded-2xl shadow-lg text-white relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Due Amount</p><h2 class="text-4xl font-extrabold mb-2" id="current-bill-amount">Rs 0.00</h2>
+                <div class="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm"><i class="fa-solid fa-calendar-day"></i> Current Month</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Recent Bills</h3></div>
+                <div class="overflow-x-auto no-scrollbar"><table class="w-full text-left min-w-[600px]"><thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold sticky top-0"><tr><th class="p-3 pl-4">Month</th><th class="p-3">Usage</th><th class="p-3 text-right">Maint</th><th class="p-3 text-center">Fine</th><th class="p-3 text-right">Total</th><th class="p-3 text-center">Status</th></tr></thead><tbody id="bill-history-body" class="divide-y divide-slate-50 text-sm"></tbody></table></div>
+                <div id="no-bills-msg" class="hidden p-8 text-center text-slate-400 text-sm">No billing history yet.</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Login Activity</h3></div>
+                <div class="overflow-x-auto no-scrollbar"><table class="w-full text-left min-w-[300px]"><tbody id="login-history-body" class="divide-y divide-slate-50 text-xs"></tbody></table></div>
+                <div id="no-logins-msg" class="hidden p-6 text-center text-slate-400 text-xs">No activity found</div>
             </div>
         </main>
     </section>
 
-    <!-- MODALS -->
-    
-    <!-- Add Customer Modal -->
-    <div id="customer-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden scale-in">
-            <div class="gradient-slate px-6 py-5 flex justify-between items-center text-white">
-                <div>
-                    <h3 class="text-xl font-bold">Add New Customer</h3>
-                    <p class="text-slate-300 text-xs mt-1">Create a new customer account</p>
-                </div>
-                <button onclick="window.closeAddCustomerModal()" class="text-slate-300 hover:text-white transition hover:rotate-90 duration-300">
-                    <i class="fa-solid fa-xmark text-2xl"></i>
-                </button>
-            </div>
-            <form onsubmit="window.handleAddCustomer(event)" class="p-6 space-y-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Full Name</label>
-                    <input type="text" id="new-name" required class="w-full p-4 bg-slate-50 border-2 border-slate-200 hover:border-slate-300 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium transition-all shadow-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Email Address</label>
-                    <input type="email" id="new-email" required class="w-full p-4 bg-slate-50 border-2 border-slate-200 hover:border-slate-300 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium transition-all shadow-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Password</label>
-                    <input type="password" id="new-pass" required minlength="6" class="w-full p-4 bg-slate-50 border-2 border-slate-200 hover:border-slate-300 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium transition-all shadow-sm">
-                </div>
-                <div class="flex gap-3 mt-8">
-                    <button type="button" onclick="window.closeAddCustomerModal()" class="flex-1 p-4 border-2 border-slate-200 rounded-xl text-slate-600 font-bold hover:bg-slate-50 transition text-sm">Cancel</button>
-                    <button type="submit" class="flex-1 p-4 btn-primary text-white rounded-xl font-bold shadow-lg text-sm">
-                        <i class="fa-solid fa-plus mr-2"></i> Create Customer
-                    </button>
-                </div>
+    <div id="customer-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-end md:items-center justify-center z-50 p-0 md:p-4">
+        <div class="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden slide-up-mobile md:animate-scale-in max-h-[90vh] flex flex-col">
+            <div class="gradient-slate px-5 py-4 flex justify-between items-center text-white shrink-0"><span class="font-bold text-lg">Add Customer</span><button onclick="window.closeAddCustomerModal()" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full"><i class="fa-solid fa-xmark"></i></button></div>
+            <form onsubmit="window.handleAddCustomer(event)" class="p-6 space-y-4 overflow-y-auto">
+                <input type="text" id="new-name" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium" placeholder="Full Name">
+                <input type="email" id="new-email" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium" placeholder="Email">
+                <input type="password" id="new-pass" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium" placeholder="Password">
+                <div class="pt-2"><button type="submit" class="w-full p-4 btn-primary text-white rounded-xl font-bold shadow-md">Create Customer</button></div>
             </form>
         </div>
     </div>
 
-    <!-- Customer Details Modal -->
-    <div id="customer-details-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md hidden items-center justify-center z-40 p-4 overflow-y-auto">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl my-8 overflow-hidden scale-in">
-            <div class="gradient-slate px-6 py-6 flex justify-between items-center text-white">
-                <div>
-                    <h3 class="text-2xl font-bold" id="detail-customer-name">Customer Name</h3>
-                    <p class="text-slate-300 text-sm mt-1" id="detail-customer-email">email@example.com</p>
-                </div>
-                <button onclick="window.closeCustomerDetailsModal()" class="text-slate-300 hover:text-white transition hover:rotate-90 duration-300">
-                    <i class="fa-solid fa-xmark text-3xl"></i>
-                </button>
+    <div id="customer-details-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-end md:items-center justify-center z-40 p-0 md:p-4">
+        <div class="bg-white w-full md:max-w-4xl rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden h-[95vh] md:h-auto md:max-h-[90vh] flex flex-col slide-up-mobile md:animate-scale-in">
+            <div class="gradient-slate px-5 py-4 flex justify-between items-center text-white shrink-0">
+                <div class="overflow-hidden mr-4"><h3 class="font-bold text-lg truncate" id="detail-customer-name">Name</h3><p class="text-xs text-slate-300 truncate" id="detail-customer-email">email</p></div>
+                <button onclick="window.closeCustomerDetailsModal()" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full shrink-0"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Left: Action & Stats -->
-                <div class="space-y-6">
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border-2 border-blue-200 shadow-md card-hover">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 rounded-xl gradient-blue flex items-center justify-center">
-                                <i class="fa-solid fa-gauge-high text-white text-xl"></i>
-                            </div>
-                            <h4 class="text-blue-900 font-bold text-base uppercase tracking-wide">Last Meter Reading</h4>
-                        </div>
-                        <div class="flex items-end gap-3 mb-3">
-                            <span class="text-6xl font-extrabold text-blue-600" id="detail-last-units">0</span>
-                            <span class="text-blue-400 font-bold mb-2 text-lg">Units</span>
-                        </div>
-                        <p class="text-xs text-blue-600 font-medium bg-blue-100 p-2 rounded-lg">💡 Use this figure to calculate this month's bill</p>
+            <div class="flex-1 overflow-y-auto bg-slate-50 p-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-sm">
+                        <p class="text-xs text-slate-500 uppercase font-bold mb-1">Last Reading</p>
+                        <div class="flex items-baseline gap-2 mb-4"><span class="text-4xl font-extrabold text-blue-600" id="detail-last-units">0</span><span class="text-sm font-bold text-blue-400">Units</span></div>
+                        <button onclick="window.openBillingModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center gap-2 active:scale-95"><i class="fa-solid fa-calculator"></i> New Bill</button>
                     </div>
-                    
-                    <button onclick="window.openBillingModal()" class="w-full gradient-blue text-white py-5 rounded-xl font-bold hover:shadow-2xl shadow-lg transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 text-base">
-                        <i class="fa-solid fa-calculator text-xl"></i> Generate New Bill
-                    </button>
-                </div>
-
-                <!-- Right: History -->
-                <div class="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-md" style="height: 500px;">
-                    <div class="p-5 bg-gradient-to-r from-slate-50 to-indigo-50 border-b-2 border-slate-200 font-bold text-slate-800 flex items-center gap-3">
-                        <i class="fa-solid fa-history text-indigo-500"></i>
-                        Billing History
-                    </div>
-                    <div class="overflow-y-auto flex-grow p-0">
-                        <table class="w-full text-sm text-left min-w-[350px]">
-                            <thead class="bg-slate-100 text-xs uppercase font-bold text-slate-600 sticky top-0 border-b border-slate-200">
-                                <tr>
-                                    <th class="p-4">Month</th>
-                                    <th class="p-4">Total</th>
-                                    <th class="p-4 text-center">Status</th>
-                                    <th class="p-4 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="detail-history-body" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                        <div id="detail-no-history" class="p-12 text-center">
-                            <i class="fa-solid fa-file-circle-question text-6xl text-slate-300 mb-4"></i>
-                            <p class="text-slate-400 font-semibold text-sm">No billing history found</p>
+                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm md:h-[400px] flex flex-col">
+                        <div class="p-3 bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase">Billing History</div>
+                        <div class="overflow-auto flex-1">
+                            <table class="w-full text-left text-sm min-w-[650px]">
+                                <thead class="bg-slate-50 sticky top-0 text-[10px] uppercase text-slate-400 font-bold border-b border-slate-100">
+                                    <tr><th class="p-3">Month</th><th class="p-3">Usage</th><th class="p-3 text-right">Total</th><th class="p-3 text-center">Status</th><th class="p-3 text-right">Action</th></tr>
+                                </thead>
+                                <tbody id="detail-history-body" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                            <div id="detail-no-history" class="p-8 text-center text-slate-400 text-xs hidden">No history found</div>
                         </div>
                     </div>
                 </div>
@@ -603,415 +309,211 @@
         </div>
     </div>
 
-    <!-- Billing Modal -->
-    <div id="billing-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden scale-in">
-            <div class="gradient-blue px-6 py-5 flex justify-between items-center text-white">
-                <div>
-                    <h3 class="text-xl font-bold">Generate Bill</h3>
-                    <p class="text-indigo-100 text-xs mt-1">Calculate water charges for this month</p>
+    <div id="billing-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm hidden items-end md:items-center justify-center z-50 p-0 md:p-4">
+        <div class="bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] slide-up-mobile md:animate-scale-in">
+            <div class="gradient-blue px-5 py-4 flex justify-between items-center text-white shrink-0"><span class="font-bold text-lg">Generate Bill</span><button onclick="window.closeBillingModal()" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full"><i class="fa-solid fa-xmark"></i></button></div>
+            <form onsubmit="window.handleBillingSubmit(event)" class="flex-1 overflow-y-auto p-5">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Previous</label><input type="text" id="modal-prev-units" readonly class="w-full bg-slate-100 text-slate-500 p-3 rounded-xl border border-transparent font-bold text-center"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Bill Month</label><input type="month" id="modal-month" required class="w-full bg-white border border-slate-300 p-3 rounded-xl text-sm font-semibold"></div>
                 </div>
-                <button onclick="window.closeBillingModal()" class="text-indigo-200 hover:text-white transition hover:rotate-90 duration-300">
-                    <i class="fa-solid fa-xmark text-2xl"></i>
-                </button>
-            </div>
-            <form onsubmit="window.handleBillingSubmit(event)" class="p-6">
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <div class="text-xs font-bold text-slate-600 uppercase mb-2">Last Units</div>
-                        <input type="text" id="modal-prev-units" readonly class="w-full bg-slate-100 text-slate-600 p-4 rounded-xl border-0 cursor-not-allowed font-bold text-lg">
-                    </div>
-                    <div>
-                        <div class="text-xs font-bold text-slate-600 uppercase mb-2">Month</div>
-                        <input type="month" id="modal-month" required class="w-full bg-white border-2 border-slate-200 p-4 rounded-xl outline-none focus:border-indigo-500 font-semibold transition">
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <div class="text-xs font-bold text-slate-600 uppercase mb-2">Present Units</div>
-                    <input type="number" id="modal-present-units" required min="0" step="0.01" oninput="window.previewCalculation()" class="w-full bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 p-4 rounded-xl outline-none focus:border-blue-500 text-blue-600 font-bold text-2xl transition font-mono text-right shadow-inner" placeholder="0.00">
-                    <p class="text-xs text-slate-500 mt-3 flex justify-between bg-slate-50 p-3 rounded-lg">
-                        <span>📊 Rate: 1-10 (Rs 65), >10 (Rs 70)</span>
-                        <span class="text-blue-600 font-bold">Decimals (Rs 60)</span>
-                    </p>
-                </div>
-
-                <div id="calc-breakdown" class="bg-gradient-to-br from-slate-50 to-indigo-50 p-5 rounded-2xl mb-6 text-sm space-y-3 border-2 border-indigo-100 shadow-inner"></div>
-
-                <div class="mb-6">
-                    <label class="text-xs font-bold text-slate-600 uppercase mb-3 block">Add Fine Amount</label>
-                    <div class="flex gap-2" id="fine-buttons"></div>
-                </div>
-
-                <div class="flex justify-between items-center mb-8 pt-5 border-t-2 border-slate-200">
-                    <span class="font-bold text-slate-700 text-lg">Total Payable:</span>
-                    <span id="preview-total" class="text-4xl font-extrabold gradient-blue bg-clip-text text-transparent">Rs 0.00</span>
-                </div>
-
-                <div class="flex gap-3">
-                    <button type="button" onclick="window.closeBillingModal()" class="flex-1 p-4 border-2 border-slate-200 rounded-xl text-slate-600 font-bold hover:bg-slate-50 transition text-sm">Cancel</button>
-                    <button type="submit" class="flex-1 p-4 btn-primary text-white rounded-xl font-bold shadow-lg text-sm">
-                        <i class="fa-solid fa-save mr-2"></i> Save Bill
-                    </button>
-                </div>
+                <div class="mb-5"><label class="text-[10px] font-bold text-blue-600 uppercase block mb-1">New Reading</label><input type="number" id="modal-present-units" required min="0" step="0.01" oninput="window.previewCalculation()" class="w-full bg-blue-50 border-2 border-blue-200 focus:border-blue-500 p-4 rounded-xl text-blue-700 font-bold text-3xl text-right placeholder-blue-200 outline-none" placeholder="0.00"></div>
+                <div id="calc-breakdown" class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-5 text-sm space-y-2"><p class="text-center text-slate-400 text-xs italic">Enter a reading to see breakdown</p></div>
+                <div class="flex justify-between items-center pt-2 border-t border-slate-100 mb-4"><span class="font-bold text-slate-600">Total:</span><span id="preview-total" class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Rs 0.00</span></div>
+                <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold shadow-lg">Save Bill</button>
             </form>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="fixed bottom-0 left-0 w-full gradient-slate text-center py-4 text-slate-400 text-xs font-semibold shadow-2xl z-50 border-t border-slate-700">
-        <div class="flex items-center justify-center gap-2">
-            <i class="fa-solid fa-code text-indigo-400"></i>
-            <span>Developed by <span class="text-white font-bold">Isuru Sampath</span></span>
+    <div id="bill-details-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm hidden items-end md:items-center justify-center z-[60] p-0 md:p-4">
+        <div class="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] slide-up-mobile md:animate-scale-in">
+            <div class="bg-slate-800 px-5 py-4 flex justify-between items-center text-white shrink-0">
+                <span class="font-bold text-lg"><i class="fa-solid fa-receipt mr-2"></i>Bill Details</span>
+                <button onclick="document.getElementById('bill-details-modal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="bill-details-content" class="p-6 overflow-y-auto bg-slate-50">
+                </div>
         </div>
+    </div>
+
+    <footer class="fixed bottom-0 left-0 w-full gradient-slate text-center py-2 text-slate-400 text-[10px] font-semibold shadow-2xl z-50 border-t border-slate-700 md:text-xs md:py-4">
+        <div class="flex items-center justify-center gap-2"><i class="fa-solid fa-code text-indigo-400"></i><span>Developed by <span class="text-white font-bold">Isuru Sampath</span></span></div>
     </footer>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, setDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, setDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- CONFIGURATION ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgiS8AwDIV8quJ5xK1RhynNvdXp5GTyEw",
-            authDomain: "hydrobill-mobile.firebaseapp.com",
-            projectId: "hydrobill-mobile",
-            storageBucket: "hydrobill-mobile.firebasestorage.app",
-            messagingSenderId: "518368679428",
-            appId: "1:518368679428:web:8e7af73daaf04f77130751"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyAgiS8AwDIV8quJ5xK1RhynNvdXp5GTyEw", authDomain: "hydrobill-mobile.firebaseapp.com", projectId: "hydrobill-mobile", storageBucket: "hydrobill-mobile.firebasestorage.app", messagingSenderId: "518368679428", appId: "1:518368679428:web:8e7af73daaf04f77130751" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentUser = null;
-        let currentRole = '';
-        let currentBillCustomerId = null;
-        let currentFineAmount = 0;
+        let currentUser = null, currentRole = '', currentBillCustomerId = null, currentFineAmount = 0;
+        const rateDecimal = 60;
 
-        const rateDecimal = 60; 
-
-        // --- UI NAVIGATION ---
-        function hideAllViews() {
-            const views = ['auth-section', 'admin-dashboard', 'customer-dashboard', 'view-role-select', 'view-login', 'view-register'];
-            views.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden'); });
-        }
-        function showAuth() {
-            hideAllViews();
-            document.getElementById('auth-section').classList.remove('hidden');
-            document.getElementById('view-role-select').classList.remove('hidden');
-        }
+        function hideAllViews() { ['auth-section', 'admin-dashboard', 'customer-dashboard', 'view-role-select', 'view-login', 'view-register'].forEach(id => document.getElementById(id).classList.add('hidden')); }
+        function showAuth() { hideAllViews(); document.getElementById('auth-section').classList.remove('hidden'); document.getElementById('view-role-select').classList.remove('hidden'); }
         window.resetToStart = () => { window.currentRole = ''; showAuth(); };
         window.toggleAuthMode = (mode) => {
-            hideAllViews();
-            document.getElementById('auth-section').classList.remove('hidden');
-            if (mode === 'register') {
-                document.getElementById('view-register').classList.remove('hidden');
-            } else {
-                document.getElementById('view-login').classList.remove('hidden');
-            }
+            hideAllViews(); document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById(mode === 'register' ? 'view-register' : 'view-login').classList.remove('hidden');
         };
         window.selectRole = (role) => {
-            window.currentRole = role;
-            window.toggleAuthMode('login');
-            document.getElementById('login-title').textContent = role === 'admin' ? 'Admin Login' : 'Customer Login';
-            document.getElementById('login-subtitle').textContent = role === 'admin' ? 'Access the management portal' : 'View your bills and history';
+            try { window.currentRole = role; window.toggleAuthMode('login'); document.getElementById('login-title').textContent = role === 'admin' ? 'Admin Login' : 'Customer Login'; document.getElementById('login-subtitle').textContent = role === 'admin' ? 'Access portal' : 'View bills'; } catch (e) { console.error(e); }
         };
 
-        // --- UTILS ---
-        function toggleLoader(show) {
-            const loader = document.getElementById('loader');
-            if (show) loader.classList.remove('hidden');
-            else loader.classList.add('hidden');
-        }
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            if(!container) return;
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check text-green-600 text-2xl"></i>' : '<i class="fa-solid fa-circle-exclamation text-red-600 text-2xl"></i>';
-            toast.innerHTML = `
-                <div class="flex items-center gap-4">${icon}<div><h4 class="font-bold text-slate-800 text-sm">${type === 'success' ? 'Success' : 'Error'}</h4><p class="text-slate-600 text-xs mt-1">${message}</p></div></div>
-                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
-            `;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(400px)'; setTimeout(() => toast.remove(), 300); }, 4000);
+        function toggleLoader(show) { const l = document.getElementById('loader'); show ? l.classList.remove('hidden') : l.classList.add('hidden'); }
+        function showToast(msg, type = 'success') {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<div class="flex items-center gap-3"><i class="fa-solid ${type==='success'?'fa-circle-check text-green-500':'fa-circle-exclamation text-red-500'} text-xl"></i><div><p class="text-slate-700 font-bold text-sm">${msg}</p></div></div>`;
+            c.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = window.innerWidth < 640 ? 'translateY(100px)' : 'translateX(400px)'; setTimeout(() => t.remove(), 300); }, 3000);
         }
 
-        // --- AUTH LOGIC ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                currentUser = user;
-                toggleLoader(true);
+                currentUser = user; toggleLoader(true);
                 try {
                     const q = query(collection(db, "users"), where("uid", "==", user.uid));
-                    const querySnapshot = await getDocs(q);
-                    if (!querySnapshot.empty) {
-                        const userData = querySnapshot.docs[0].data();
-                        toggleLoader(false);
-                        hideAllViews();
-                        if (userData.role === 'admin') initAdminDashboard();
-                        else initCustomerDashboard(userData);
-                    } else {
-                        toggleLoader(false);
-                        showToast("User record not found", "error");
-                        signOut(auth);
-                    }
-                } catch (error) {
-                    toggleLoader(false);
-                    showToast("Data fetch error", "error");
-                }
-            } else {
-                toggleLoader(false);
-                if (!document.getElementById('auth-section').classList.contains('hidden')) { /* Stay */ } 
-                else showAuth();
-            }
+                    const snap = await getDocs(q);
+                    if (!snap.empty) {
+                        const d = snap.docs[0].data(); toggleLoader(false); hideAllViews();
+                        d.role === 'admin' ? initAdminDashboard() : initCustomerDashboard(d);
+                    } else { toggleLoader(false); showToast("User not found", "error"); signOut(auth); }
+                } catch (e) { toggleLoader(false); showToast("Error fetching data", "error"); }
+            } else { toggleLoader(false); if (!document.getElementById('auth-section').classList.contains('hidden')) {} else showAuth(); }
         });
+
         window.handleLogin = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            toggleLoader(true);
-            try { 
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                await addDoc(collection(db, "login_logs"), {
-                    uid: userCredential.user.uid, email: email, timestamp: new Date(), status: 'Success'
-                });
-            } 
-            catch (error) { toggleLoader(false); showToast("Login Failed: " + error.message, "error"); }
-        };
-        window.handleRegister = async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
-            toggleLoader(true);
+            e.preventDefault(); toggleLoader(true);
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const uid = userCredential.user.uid;
-                await setDoc(doc(db, "users", uid), { uid, name, email, role: window.currentRole, createdAt: new Date() });
-                await signOut(auth);
-                toggleLoader(false);
-                showToast("Account created! Please log in.");
-                window.toggleAuthMode('login');
-                e.target.reset();
-            } catch (error) {
-                toggleLoader(false);
-                showToast("Registration Error: " + error.message, "error");
-            }
+                const u = await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
+                await addDoc(collection(db, "login_logs"), { uid: u.user.uid, email: u.user.email, timestamp: new Date(), status: 'Success' });
+            } catch (e) { toggleLoader(false); showToast("Login Failed", "error"); }
+        };
+
+        window.handleRegister = async (e) => {
+            e.preventDefault(); toggleLoader(true);
+            try {
+                const u = await createUserWithEmailAndPassword(auth, document.getElementById('reg-email').value, document.getElementById('reg-password').value);
+                await setDoc(doc(db, "users", u.user.uid), { uid: u.user.uid, name: document.getElementById('reg-name').value, email: u.user.email, role: window.currentRole, createdAt: new Date() });
+                await signOut(auth); toggleLoader(false); showToast("Account created!"); window.toggleAuthMode('login'); e.target.reset();
+            } catch (e) { toggleLoader(false); showToast(e.message, "error"); }
         };
         window.logout = async () => { try { await signOut(auth); window.location.reload(); } catch(e){} };
 
-        // --- REPORT GENERATION ---
-        window.generateReport = async () => {
-            const month = document.getElementById('report-month').value;
-            if (!month) { showToast("Please select a month", "error"); return; }
-
-            toggleLoader(true);
-            try {
-                const q = query(collection(db, "bills"), where("month", "==", month));
-                const querySnapshot = await getDocs(q);
-                let reportData = [];
-                
-                if (querySnapshot.empty) {
-                    toggleLoader(false);
-                    showToast("No bills found for this month", "error");
-                    return;
-                }
-
-                querySnapshot.forEach(doc => {
-                    reportData.push({ id: doc.id, ...doc.data() });
-                });
-
-                const usersSnap = await getDocs(collection(db, "users"));
-                const usersMap = {};
-                usersSnap.forEach(doc => usersMap[doc.id] = doc.data());
-
-                let totalUnits = 0;
-                let totalRevenue = 0;
-                reportData.forEach(bill => {
-                    totalUnits += bill.consumed;
-                    totalRevenue += bill.total;
-                });
-                
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF();
-                
-                // Enhanced PDF Design
-                pdf.setFillColor(102, 126, 234);
-                pdf.rect(0, 0, 210, 50, "F");
-                
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(28);
-                pdf.setFont("helvetica", "bold");
-                pdf.text("HydroBill", 105, 25, { align: "center" });
-                
-                pdf.setFontSize(14);
-                pdf.setFont("helvetica", "normal");
-                pdf.text(`Monthly Report - ${month}`, 105, 35, { align: "center" });
-                
-                // Summary Box
-                pdf.setFillColor(240, 240, 255);
-                pdf.roundedRect(15, 60, 180, 30, 3, 3, "F");
-                pdf.setTextColor(51, 51, 51);
-                pdf.setFontSize(11);
-                pdf.setFont("helvetica", "bold");
-                pdf.text(`Total Customers: ${reportData.length}`, 20, 70);
-                pdf.text(`Total Units: ${totalUnits.toFixed(2)}`, 20, 78);
-                pdf.text(`Total Revenue: Rs ${totalRevenue.toFixed(2)}`, 20, 86);
-
-                // Table Header
-                pdf.setDrawColor(200, 200, 200);
-                pdf.setFillColor(102, 126, 234);
-                pdf.roundedRect(15, 100, 180, 12, 2, 2, "FD");
-                
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFontSize(10);
-                pdf.setFont("helvetica", "bold");
-                pdf.text("Customer", 20, 108);
-                pdf.text("Email", 70, 108);
-                pdf.text("Units", 130, 108);
-                pdf.text("Total (Rs)", 165, 108);
-
-                // Table Rows
-                let y = 120;
-                pdf.setFont("helvetica", "normal");
-                pdf.setTextColor(51, 51, 51);
-                reportData.forEach((bill, index) => {
-                    if(y > 270) { pdf.addPage(); y = 20; }
-                    
-                    const customer = usersMap[bill.customerId] || { name: "Unknown", email: "N/A" };
-                    const bgColor = index % 2 === 0 ? 250 : 245;
-                    pdf.setFillColor(bgColor, bgColor, bgColor);
-                    pdf.rect(15, y - 5, 180, 8, "F");
-                    
-                    pdf.text(customer.name.substring(0, 20), 20, y);
-                    pdf.text(customer.email.substring(0, 25), 70, y);
-                    pdf.text(bill.consumed.toFixed(2), 135, y);
-                    pdf.text(bill.total.toFixed(2), 170, y);
-                    y += 10;
-                });
-
-                // Footer
-                pdf.setDrawColor(102, 126, 234);
-                pdf.setLineWidth(1);
-                pdf.line(15, y + 5, 195, y + 5);
-                y += 15;
-                pdf.setFontSize(10);
-                pdf.setFont("helvetica", "italic");
-                pdf.setTextColor(100, 100, 100);
-                pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, y, { align: "center" });
-                pdf.text("HydroBill - Professional Water Management", 105, y + 6, { align: "center" });
-
-                pdf.save(`HydroBill_Report_${month}.pdf`);
-                
-                // Show stats
-                document.getElementById('report-stats').classList.remove('hidden');
-                document.querySelector('.report-month-display').textContent = month;
-                document.getElementById('report-total-units').textContent = totalUnits.toFixed(2);
-                
-                showToast("Report Downloaded Successfully!");
-                toggleLoader(false);
-            } catch (error) {
-                toggleLoader(false);
-                showToast("Error generating report: " + error.message, "error");
-            }
-        };
-
-        // --- ADMIN FUNCTIONS ---
-        function initAdminDashboard() {
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            document.getElementById('report-month').value = new Date().toISOString().slice(0, 7);
-            renderCustomerTable();
-        }
+        function initAdminDashboard() { document.getElementById('admin-dashboard').classList.remove('hidden'); document.getElementById('report-month').value = new Date().toISOString().slice(0, 7); renderCustomerTable(); }
+        
         window.renderCustomerTable = async () => {
             const tbody = document.getElementById('customer-table-body');
             const search = document.getElementById('admin-search').value.toLowerCase();
-            const noMsg = document.getElementById('no-customers-msg');
             tbody.innerHTML = '';
             try {
                 const q = query(collection(db, "users"), where("role", "==", "customer"));
-                const querySnapshot = await getDocs(q);
-                document.getElementById('total-customers-count').textContent = querySnapshot.size;
-                
-                let hasResults = false;
-                querySnapshot.forEach((docSnap) => {
+                const snap = await getDocs(q);
+                document.getElementById('total-customers-count').textContent = snap.size;
+                if(snap.empty) document.getElementById('no-customers-msg').classList.remove('hidden');
+                else document.getElementById('no-customers-msg').classList.add('hidden');
+
+                snap.forEach((docSnap) => {
                     const c = docSnap.data();
                     if (c.name.toLowerCase().includes(search) || c.email.toLowerCase().includes(search)) {
-                        hasResults = true;
                         const tr = document.createElement('tr');
-                        tr.className = "hover:bg-indigo-50 transition border-b border-slate-100 last:border-0 group";
+                        tr.className = "hover:bg-slate-50 transition border-b border-slate-50 last:border-0";
                         tr.innerHTML = `
-                            <td class="p-6">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-md group-hover:scale-110 transition-transform">${c.name.charAt(0).toUpperCase()}</div>
-                                    <div>
-                                        <div class="font-bold text-slate-800 text-base">${c.name}</div>
-                                        <div class="text-xs text-slate-500 flex items-center gap-2 mt-1">
-                                            <i class="fa-solid fa-envelope text-xs"></i>
-                                            ${c.email}
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="p-6 hidden sm:table-cell">
-                                <span class="bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 px-3 py-2 rounded-lg text-xs font-bold border border-green-200 shadow-sm">
-                                    <i class="fa-solid fa-circle-check mr-1"></i> Active
-                                </span>
-                            </td>
-                            <td class="p-6 text-right">
-                                <button onclick="window.openCustomerDetails('${c.uid}', '${c.name.replace(/'/g, "\\'")}', '${c.email}')" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0">
-                                    <i class="fa-solid fa-gear mr-1"></i> Manage
-                                </button>
-                            </td>
+                            <td class="p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shadow-sm">${c.name.charAt(0).toUpperCase()}</div><div class="overflow-hidden"><div class="font-bold text-slate-800 text-sm truncate max-w-[150px]">${c.name}</div><div class="text-xs text-slate-400 truncate max-w-[150px]">${c.email}</div></div></div></td>
+                            <td class="p-4 hidden sm:table-cell"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold">ACTIVE</span></td>
+                            <td class="p-4 text-right"><button onclick="window.openCustomerDetails('${c.uid}', '${c.name.replace(/'/g, "\\'")}', '${c.email}')" class="bg-white border border-slate-200 text-indigo-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-50 shadow-sm">Manage</button></td>
                         `;
                         tbody.appendChild(tr);
                     }
                 });
-                
-                if (hasResults) {
-                    noMsg.classList.add('hidden');
-                } else {
-                    noMsg.classList.remove('hidden');
-                }
-            } catch (error) { 
-                console.error(error); 
-                showToast("Failed to load customers", "error"); 
-            }
-        };
-        window.openAddCustomerModal = () => {
-            document.getElementById('customer-modal').classList.remove('hidden');
-            document.getElementById('customer-modal').classList.add('flex');
-        };
-        window.closeAddCustomerModal = () => {
-            document.getElementById('customer-modal').classList.add('hidden');
-            document.getElementById('customer-modal').classList.remove('flex');
-            ['new-name','new-email','new-pass'].forEach(id=>document.getElementById(id).value='');
-        };
-        window.handleAddCustomer = async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('new-name').value;
-            const email = document.getElementById('new-email').value;
-            const password = document.getElementById('new-pass').value;
-            toggleLoader(true);
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const uid = userCredential.user.uid;
-                await setDoc(doc(db, "users", uid), { uid, name, email, role: 'customer', createdAt: new Date() });
-                await signOut(auth);
-                toggleLoader(false);
-                closeAddCustomerModal();
-                showToast("Customer Added. Reloading...");
-                setTimeout(() => window.location.reload(), 2000);
-            } catch (error) {
-                toggleLoader(false);
-                showToast(error.message, "error");
-            }
+            } catch (error) { console.error(error); }
         };
 
-        // --- CUSTOMER DETAILS & BILLING LOGIC ---
+        // --- NEW: View Bill Details Logic ---
+        window.viewBillDetails = (billDataEncoded) => {
+            const bill = JSON.parse(decodeURIComponent(billDataEncoded));
+            
+            // Re-calculate breakdown for display
+            const consumed = bill.consumed;
+            const intUnits = Math.floor(consumed);
+            const decUnits = parseFloat((consumed - intUnits).toFixed(2));
+            
+            let costInt = 0;
+            let tier1Cost = Math.min(intUnits, 10) * 65;
+            let tier2Cost = 0;
+            if (intUnits > 10) tier2Cost = (intUnits - 10) * 70;
+            costInt = tier1Cost + tier2Cost;
+            const costDec = decUnits * rateDecimal;
+            const waterCharge = costInt + costDec;
+            const maintain = bill.maintenance || 250;
+            const fine = bill.fineAmount || 0;
+            const total = bill.total;
+
+            const html = `
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-slate-800">${bill.month}</h3>
+                    <span class="${bill.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${bill.status}</span>
+                </div>
+                
+                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-4">
+                    <div class="receipt-row font-bold text-slate-700 mb-2 border-b border-slate-100 pb-2">
+                        <span>Meter Reading</span>
+                    </div>
+                    <div class="receipt-row"><span>Previous</span> <span>${bill.prevUnits}</span></div>
+                    <div class="receipt-row"><span>Present</span> <span>${bill.presentUnits}</span></div>
+                    <div class="receipt-row text-blue-600 font-bold"><span>Consumed</span> <span>${bill.consumed} Units</span></div>
+                </div>
+
+                <div class="space-y-1">
+                    <div class="receipt-row text-xs uppercase font-bold text-slate-400 mt-4 mb-2">Charges Breakdown</div>
+                    
+                    ${intUnits > 0 ? `
+                    <div class="receipt-row">
+                        <span>First ${Math.min(intUnits, 10)} Units <span class="text-xs text-slate-400">x Rs 65</span></span>
+                        <span>Rs ${tier1Cost.toFixed(2)}</span>
+                    </div>` : ''}
+                    
+                    ${intUnits > 10 ? `
+                    <div class="receipt-row">
+                        <span>Additional ${intUnits - 10} Units <span class="text-xs text-slate-400">x Rs 70</span></span>
+                        <span>Rs ${tier2Cost.toFixed(2)}</span>
+                    </div>` : ''}
+
+                    ${decUnits > 0 ? `
+                    <div class="receipt-row">
+                        <span>Decimal ${decUnits} Units <span class="text-xs text-slate-400">x Rs 60</span></span>
+                        <span>Rs ${costDec.toFixed(2)}</span>
+                    </div>` : ''}
+
+                    <div class="receipt-divider"></div>
+                    
+                    <div class="receipt-row"><span>Base Water Charge</span> <span>Rs ${waterCharge.toFixed(2)}</span></div>
+                    <div class="receipt-row"><span>Maintenance Fee</span> <span>Rs ${maintain.toFixed(2)}</span></div>
+                    
+                    ${fine > 0 ? `
+                    <div class="receipt-row text-red-500 font-bold">
+                        <span>Late/Penalty Fines</span>
+                        <span>+ Rs ${fine.toFixed(2)}</span>
+                    </div>` : ''}
+
+                    <div class="receipt-row total">
+                        <span>Total Payable</span>
+                        <span>Rs ${total.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('bill-details-content').innerHTML = html;
+            document.getElementById('bill-details-modal').classList.remove('hidden');
+            document.getElementById('bill-details-modal').classList.add('flex');
+        };
+
         let currentManageCustomerId = null;
         window.openCustomerDetails = async (uid, name, email) => {
             currentManageCustomerId = uid;
@@ -1019,35 +521,57 @@
             document.getElementById('detail-customer-email').textContent = email;
             
             const q = query(collection(db, "bills"), where("customerId", "==", uid));
-            const querySnapshot = await getDocs(q);
+            const snap = await getDocs(q);
             let bills = [];
-            querySnapshot.forEach(d => bills.push({id: d.id, ...d.data()}));
+            snap.forEach(d => bills.push({id: d.id, ...d.data()}));
             bills.sort((a, b) => b.month.localeCompare(a.month));
 
-            let lastUnits = 0;
-            if (bills.length > 0) lastUnits = bills[0].presentUnits;
-            document.getElementById('detail-last-units').textContent = lastUnits;
-
+            if (bills.length > 0) document.getElementById('detail-last-units').textContent = bills[0].presentUnits;
+            
             const tbody = document.getElementById('detail-history-body');
             const noHist = document.getElementById('detail-no-history');
             tbody.innerHTML = '';
             
-            if (bills.length === 0) {
-                noHist.classList.remove('hidden');
-            } else {
+            if (bills.length === 0) noHist.classList.remove('hidden');
+            else {
                 noHist.classList.add('hidden');
-                bills.forEach((bill, index) => {
+                bills.forEach((bill) => {
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 transition border-b border-slate-100 last:border-0";
-                    const statusClass = bill.status === 'Paid' ? 'status-paid' : 'status-unpaid';
-                    const actionBtn = bill.status === 'Unpaid' 
-                        ? `<button onclick="window.toggleBillStatus('${bill.id}', 'Paid')" class="text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold transition border border-green-200"><i class="fa-solid fa-check mr-1"></i> Mark Paid</button>`
-                        : `<button onclick="window.toggleBillStatus('${bill.id}', 'Unpaid')" class="text-slate-500 hover:bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-rotate-left mr-1"></i> Unpay</button>`;
+                    tr.className = "hover:bg-slate-50 border-b border-slate-50";
+                    const billDataSafe = encodeURIComponent(JSON.stringify(bill)); // Safe encoding for button
+                    
+                    let actionHtml = '';
+                    if (bill.status === 'Unpaid') {
+                        actionHtml = `
+                            <div class="flex flex-col gap-1 items-end justify-end">
+                                <div class="flex gap-1">
+                                    <button onclick="window.viewBillDetails('${billDataSafe}')" class="bg-blue-100 text-blue-600 p-1.5 rounded-md hover:bg-blue-200 transition"><i class="fa-solid fa-eye"></i></button>
+                                    <button onclick="window.markBillAsPaid('${bill.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold shadow-sm hover:bg-emerald-700">PAY</button>
+                                </div>
+                                <div class="flex gap-1 mt-1">
+                                    <button onclick="window.addFineToBill('${bill.id}', 50)" class="btn-fine bg-orange-50 text-orange-600 border border-orange-100">+50</button>
+                                    <button onclick="window.addFineToBill('${bill.id}', 200)" class="btn-fine bg-red-50 text-red-600 border border-red-100">+200</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        actionHtml = `
+                            <div class="flex justify-end items-center gap-2">
+                                <button onclick="window.viewBillDetails('${billDataSafe}')" class="bg-blue-50 text-blue-500 p-1.5 rounded-md hover:bg-blue-100 transition"><i class="fa-solid fa-eye"></i></button>
+                                <span class="text-[10px] text-slate-300 font-bold uppercase"><i class="fa-solid fa-lock mr-1"></i>Paid</span>
+                            </div>
+                        `;
+                    }
+
                     tr.innerHTML = `
-                        <td class="p-4 font-bold text-slate-800">${bill.month}</td>
-                        <td class="p-4 text-slate-600 font-semibold">Rs ${bill.total.toFixed(2)}</td>
-                        <td class="p-4 text-center"><span class="status-badge ${statusClass}">${bill.status}</span></td>
-                        <td class="p-4 text-right">${actionBtn}</td>
+                        <td class="p-3 text-xs font-bold text-slate-700 align-top pt-4">${bill.month}</td>
+                        <td class="p-3 text-xs text-slate-500 align-top pt-4">${bill.consumed}</td>
+                        <td class="p-3 text-right font-bold text-xs text-slate-800 align-top pt-4">
+                             ${bill.total.toFixed(0)}
+                             ${bill.fineAmount > 0 ? '<span class="text-[9px] text-red-500 block">(+Fine)</span>' : ''}
+                        </td>
+                        <td class="p-3 text-center align-top pt-4"><span class="${bill.status === 'Paid' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-red-500 bg-red-50 border-red-100'} border px-2 py-0.5 rounded text-[10px] font-bold uppercase">${bill.status}</span></td>
+                        <td class="p-3 text-right">${actionHtml}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -1055,100 +579,54 @@
             document.getElementById('customer-details-modal').classList.remove('hidden');
             document.getElementById('customer-details-modal').classList.add('flex');
         };
-        window.closeCustomerDetailsModal = () => {
-            document.getElementById('customer-details-modal').classList.add('hidden');
-            document.getElementById('customer-details-modal').classList.remove('flex');
-            currentManageCustomerId = null;
+        window.closeCustomerDetailsModal = () => { document.getElementById('customer-details-modal').classList.add('hidden'); document.getElementById('customer-details-modal').classList.remove('flex'); currentManageCustomerId = null; };
+
+        window.markBillAsPaid = async (billId) => {
+            if(!confirm("Mark as PAID? Cannot be undone.")) return; toggleLoader(true);
+            try { await updateDoc(doc(db, "bills", billId), { status: 'Paid' }); showToast("Bill Paid"); openCustomerDetails(currentManageCustomerId, document.getElementById('detail-customer-name').textContent, document.getElementById('detail-customer-email').textContent); toggleLoader(false); } catch (e) { toggleLoader(false); showToast("Error", "error"); }
         };
-        window.toggleBillStatus = async (billId, newStatus) => {
-            if(!confirm(`Mark bill as ${newStatus}?`)) return;
+
+        window.addFineToBill = async (billId, fineAmount) => {
+            if(!confirm(`Add Rs ${fineAmount} fine?`)) return; toggleLoader(true);
             try {
-                const billRef = doc(db, "bills", billId);
-                await updateDoc(billRef, { status: newStatus });
-                showToast(`Bill marked as ${newStatus}`);
-                const name = document.getElementById('detail-customer-name').textContent;
-                const email = document.getElementById('detail-customer-email').textContent;
-                openCustomerDetails(currentManageCustomerId, name, email);
-            } catch(e) { showToast("Error updating status", "error"); }
+                const ref = doc(db, "bills", billId); const snap = await getDoc(ref);
+                if (snap.exists() && snap.data().status === 'Unpaid') {
+                    await updateDoc(ref, { total: snap.data().total + fineAmount, fineAmount: (snap.data().fineAmount || 0) + fineAmount });
+                    showToast("Fine Added"); openCustomerDetails(currentManageCustomerId, document.getElementById('detail-customer-name').textContent, document.getElementById('detail-customer-email').textContent);
+                } else showToast("Bill Paid/Error", "error");
+                toggleLoader(false);
+            } catch (e) { toggleLoader(false); }
         };
-        window.openBillingModal = async () => {
+
+        window.openBillingModal = () => {
             currentBillCustomerId = currentManageCustomerId;
             document.getElementById('modal-prev-units').value = document.getElementById('detail-last-units').textContent;
             document.getElementById('modal-month').value = new Date().toISOString().slice(0, 7);
             document.getElementById('modal-present-units').value = '';
             currentFineAmount = 0;
-            document.getElementById('billing-modal').classList.remove('hidden');
-            document.getElementById('billing-modal').classList.add('flex');
+            document.getElementById('billing-modal').classList.remove('hidden'); document.getElementById('billing-modal').classList.add('flex');
             window.previewCalculation();
         };
-        window.closeBillingModal = () => {
-            document.getElementById('billing-modal').classList.add('hidden');
-            document.getElementById('billing-modal').classList.remove('flex');
-        };
+        window.closeBillingModal = () => { document.getElementById('billing-modal').classList.add('hidden'); document.getElementById('billing-modal').classList.remove('flex'); };
 
         window.previewCalculation = () => {
             const prev = parseFloat(document.getElementById('modal-prev-units').value) || 0;
             const pres = parseFloat(document.getElementById('modal-present-units').value) || 0;
             const breakdown = document.getElementById('calc-breakdown');
-            const fineContainer = document.getElementById('fine-buttons');
-
-            if (pres < prev) {
-                breakdown.innerHTML = `<div class="text-red-600 font-bold text-center py-3"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Invalid Reading - Present units cannot be less than previous units!</div>`;
-                document.getElementById('preview-total').textContent = "---";
-                return;
-            }
+            if (pres < prev) { breakdown.innerHTML = `<div class="text-red-500 text-xs font-bold text-center">Invalid Reading</div>`; document.getElementById('preview-total').textContent = "---"; return; }
 
             const consumed = parseFloat((pres - prev).toFixed(2));
             const intUnits = Math.floor(consumed);
             const decUnits = parseFloat((consumed - intUnits).toFixed(2));
-            
-            let costInt = 0;
-            costInt += Math.min(intUnits, 10) * 65;
+            let costInt = Math.min(intUnits, 10) * 65;
             if (intUnits > 10) costInt += (intUnits - 10) * 70;
-
             const costDec = decUnits * rateDecimal;
-
-            const waterCharge = costInt + costDec;
-            const maintain = 250;
-            const total = waterCharge + maintain + currentFineAmount;
+            const total = costInt + costDec + 250 + currentFineAmount;
 
             breakdown.innerHTML = `
-                <div class="flex justify-between text-slate-700 font-semibold border-b border-indigo-100 pb-2">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-droplet text-blue-500 text-xs"></i> Consumed Units:</span> 
-                    <span class="font-bold text-blue-600">${consumed}</span>
-                </div>
-                <div class="flex justify-between text-slate-600 text-sm">
-                    <span>Integer Units (${intUnits}):</span> 
-                    <span class="font-semibold">Rs ${costInt.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between text-blue-700 text-sm font-bold bg-blue-100 p-2 rounded-lg border border-blue-200">
-                    <span>Decimal Units (${decUnits}):</span> 
-                    <span>Rs ${costDec.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between text-slate-700 font-semibold border-t border-indigo-100 pt-2">
-                    <span>Water Charge:</span> 
-                    <span>Rs ${waterCharge.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between text-slate-600">
-                    <span>Maintenance:</span> 
-                    <span class="font-semibold">Rs ${maintain}.00</span>
-                </div>
-                ${currentFineAmount > 0 ? `<div class="flex justify-between text-red-600 font-bold bg-red-50 p-2 rounded-lg border border-red-200">
-                    <span><i class="fa-solid fa-exclamation-triangle mr-1"></i> Fine:</span> 
-                    <span>Rs ${currentFineAmount.toFixed(2)}</span>
-                </div>` : ''}
+                <div class="flex justify-between text-slate-600 text-xs"><span>Units (${consumed})</span> <span class="font-bold">Rs ${(costInt+costDec).toFixed(2)}</span></div>
+                <div class="flex justify-between text-slate-600 text-xs border-t border-slate-200 mt-1 pt-1"><span>Maintenance</span> <span class="font-bold">Rs 250.00</span></div>
             `;
-
-            fineContainer.innerHTML = '';
-            [0, 50, 200, 500].forEach(f => {
-                const btn = document.createElement('button');
-                const isActive = currentFineAmount === f;
-                btn.className = `flex-1 py-3 text-sm font-bold rounded-lg border-2 transition-all transform ${isActive ? 'bg-red-500 text-white border-red-500 scale-105 shadow-lg' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`;
-                btn.textContent = f === 0 ? 'No Fine' : `Rs ${f}`;
-                btn.type = 'button';
-                btn.onclick = () => { currentFineAmount = f; window.previewCalculation(); };
-                fineContainer.appendChild(btn);
-            });
             document.getElementById('preview-total').textContent = "Rs " + total.toFixed(2);
         };
 
@@ -1156,119 +634,77 @@
             e.preventDefault();
             const prev = parseFloat(document.getElementById('modal-prev-units').value);
             const pres = parseFloat(document.getElementById('modal-present-units').value);
-            if (pres < prev) { showToast("Invalid reading", "error"); return; }
-
-            toggleLoader(true);
+            if (pres < prev) return; toggleLoader(true);
             const consumed = parseFloat((pres - prev).toFixed(2));
             const intUnits = Math.floor(consumed);
             const decUnits = parseFloat((consumed - intUnits).toFixed(2));
             let costInt = Math.min(intUnits, 10) * 65;
             if (intUnits > 10) costInt += (intUnits - 10) * 70;
             const costDec = decUnits * rateDecimal;
-            const waterCost = costInt + costDec;
-            const month = document.getElementById('modal-month').value;
-            const total = waterCost + 250 + currentFineAmount;
+            const total = costInt + costDec + 250;
 
             try {
-                await addDoc(collection(db, "bills"), {
-                    customerId: currentBillCustomerId, 
-                    month: month, 
-                    prevUnits: prev, 
-                    presentUnits: pres, 
-                    consumed: consumed, 
-                    waterCost: waterCost, 
-                    maintenance: 250, 
-                    fineAmount: currentFineAmount, 
-                    total: total, 
-                    status: 'Unpaid', 
-                    createdAt: new Date()
-                });
-                toggleLoader(false);
-                showToast("Bill generated successfully!");
-                closeBillingModal();
-                const name = document.getElementById('detail-customer-name').textContent;
-                const email = document.getElementById('detail-customer-email').textContent;
-                openCustomerDetails(currentBillCustomerId, name, email);
-            } catch (error) {
-                toggleLoader(false);
-                showToast("Error saving bill: " + error.message, "error");
-            }
+                await addDoc(collection(db, "bills"), { customerId: currentBillCustomerId, month: document.getElementById('modal-month').value, prevUnits: prev, presentUnits: pres, consumed: consumed, waterCost: costInt+costDec, maintenance: 250, fineAmount: 0, total: total, status: 'Unpaid', createdAt: new Date() });
+                toggleLoader(false); showToast("Bill Generated"); closeBillingModal();
+                openCustomerDetails(currentBillCustomerId, document.getElementById('detail-customer-name').textContent, document.getElementById('detail-customer-email').textContent);
+            } catch (error) { toggleLoader(false); }
         };
 
-        // --- CUSTOMER DASHBOARD ---
-        function initCustomerDashboard(userData) {
-            document.getElementById('customer-dashboard').classList.remove('hidden');
-            document.getElementById('customer-name-display').textContent = userData.name;
-            document.getElementById('c-name-display').textContent = userData.name;
-            document.getElementById('c-email-display').textContent = userData.email;
-            loadCustomerBills();
-            loadLoginHistory();
-        }
+        window.generateReport = async () => {
+            const month = document.getElementById('report-month').value;
+            if (!month) { showToast("Select month", "error"); return; }
+            toggleLoader(true);
+            try {
+                const q = query(collection(db, "bills"), where("month", "==", month));
+                const snap = await getDocs(q);
+                if(snap.empty) { toggleLoader(false); showToast("No Data", "error"); return; }
+                const reportData = []; snap.forEach(d => reportData.push({id: d.id, ...d.data()}));
+                const uSnap = await getDocs(collection(db, "users"));
+                const uMap = {}; uSnap.forEach(d => uMap[d.id] = d.data());
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.text(`HydroBill Report: ${month}`, 10, 10);
+                let y = 20;
+                reportData.forEach(b => {
+                    const name = uMap[b.customerId]?.name || 'Unknown';
+                    doc.text(`${name} - ${b.consumed} units - Rs ${b.total.toFixed(2)} (${b.status})`, 10, y);
+                    y += 10;
+                });
+                doc.save(`Report_${month}.pdf`);
+                toggleLoader(false);
+            } catch(e) { toggleLoader(false); }
+        };
+
+        function initCustomerDashboard(d) { document.getElementById('customer-dashboard').classList.remove('hidden'); document.getElementById('c-name-display').textContent = d.name; document.getElementById('c-email-display').textContent = d.email; loadCustomerBills(); loadLoginHistory(); }
         async function loadCustomerBills() {
             const q = query(collection(db, "bills"), where("customerId", "==", currentUser.uid));
-            const querySnapshot = await getDocs(q);
-            const tbody = document.getElementById('bill-history-body');
-            const noData = document.getElementById('no-bills-msg');
-            tbody.innerHTML = '';
-            let bills = [];
-            querySnapshot.forEach(doc => bills.push(doc.data()));
-            bills.sort((a, b) => b.month.localeCompare(a.month));
-
-            if (bills.length > 0) {
-                document.getElementById('current-bill-amount').textContent = "Rs " + bills[0].total.toFixed(2);
-                bills.forEach((bill, index) => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-indigo-50 transition border-b border-slate-100 last:border-0";
-                    const statusClass = bill.status === 'Paid' ? 'status-paid' : 'status-unpaid';
-                    tr.innerHTML = `
-                        <td class="p-5 font-bold text-slate-800">${bill.month}</td>
-                        <td class="p-5 text-slate-600 font-semibold">${bill.consumed} Units</td>
-                        <td class="p-5 text-right font-bold text-slate-800">Rs ${bill.total.toFixed(2)}</td>
-                        <td class="p-5 text-center"><span class="status-badge ${statusClass}">${bill.status}</span></td>
-                    `;
+            const snap = await getDocs(q);
+            const tbody = document.getElementById('bill-history-body'); tbody.innerHTML = '';
+            let bills = []; snap.forEach(d => bills.push(d.data())); bills.sort((a,b)=>b.month.localeCompare(a.month));
+            if(bills.length>0) {
+                document.getElementById('current-bill-amount').textContent = "Rs "+bills[0].total.toFixed(2);
+                bills.forEach(b => {
+                    const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `<td class="p-3 pl-4 font-bold text-slate-700">${b.month}</td><td class="p-3 text-xs text-slate-500">${b.consumed} units</td><td class="p-3 text-right text-xs text-slate-400">250.00</td><td class="p-3 text-center text-xs text-slate-400">${b.fineAmount||'-'}</td><td class="p-3 text-right font-bold text-slate-800">Rs ${b.total.toFixed(0)}</td><td class="p-3 text-center"><span class="${b.status==='Paid'?'text-emerald-600 bg-emerald-50':'text-red-500 bg-red-50'} px-2 py-1 rounded text-[10px] font-bold uppercase border ${b.status==='Paid'?'border-emerald-100':'border-red-100'}">${b.status}</span></td>`;
                     tbody.appendChild(tr);
                 });
-                noData.classList.add('hidden');
-            } else {
-                document.getElementById('current-bill-amount').textContent = "Rs 0.00";
-                noData.classList.remove('hidden');
-            }
+                document.getElementById('no-bills-msg').classList.add('hidden');
+            } else document.getElementById('no-bills-msg').classList.remove('hidden');
         }
         async function loadLoginHistory() {
-            const tbody = document.getElementById('login-history-body');
-            const noData = document.getElementById('no-logins-msg');
-            tbody.innerHTML = '';
-            try {
-                const q = query(collection(db, "login_logs"), where("uid", "==", currentUser.uid));
-                const querySnapshot = await getDocs(q);
-                let logs = [];
-                querySnapshot.forEach(doc => logs.push(doc.data()));
-                logs.sort((a, b) => b.timestamp - a.timestamp);
-                const recentLogs = logs.slice(0, 10);
-
-                if (recentLogs.length > 0) {
-                    noData.classList.add('hidden');
-                    recentLogs.forEach((log, index) => {
-                        const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50 transition border-b border-slate-100 last:border-0";
-                        const date = new Date(log.timestamp.seconds * 1000).toLocaleString();
-                        const statusClass = log.status === 'Success' ? 'text-green-600' : 'text-red-600';
-                        const statusIcon = log.status === 'Success' ? 'fa-circle-check' : 'fa-circle-xmark';
-                        tr.innerHTML = `
-                            <td class="p-5 font-semibold text-slate-700 text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-clock text-slate-400 text-xs"></i>
-                                ${date}
-                            </td>
-                            <td class="p-5 text-center font-bold ${statusClass} text-xs uppercase">
-                                <i class="fa-solid ${statusIcon} mr-1"></i>
-                                ${log.status}
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                } else { noData.classList.remove('hidden'); }
-            } catch (error) { console.error(error); noData.classList.remove('hidden'); }
+            const q = query(collection(db, "login_logs"), where("uid", "==", currentUser.uid));
+            const snap = await getDocs(q);
+            const tbody = document.getElementById('login-history-body'); tbody.innerHTML = '';
+            let logs = []; snap.forEach(d => logs.push(d.data())); logs.sort((a,b)=>b.timestamp-a.timestamp);
+            if(logs.length>0) {
+                document.getElementById('no-logins-msg').classList.add('hidden');
+                logs.slice(0,5).forEach(l => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-3 pl-4 text-slate-600 text-xs">${new Date(l.timestamp.seconds*1000).toLocaleDateString()}</td>`; tbody.appendChild(tr); });
+            } else document.getElementById('no-logins-msg').classList.remove('hidden');
         }
+
+        window.openAddCustomerModal = () => { document.getElementById('customer-modal').classList.remove('hidden'); document.getElementById('customer-modal').classList.add('flex'); };
+        window.closeAddCustomerModal = () => { document.getElementById('customer-modal').classList.add('hidden'); document.getElementById('customer-modal').classList.remove('flex'); };
     </script>
 </body>
 </html>
