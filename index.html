@@ -119,6 +119,12 @@
         .receipt-row.total { font-weight: 800; color: #1e293b; font-size: 1.1rem; border-top: 2px dashed #cbd5e1; padding-top: 0.75rem; margin-top: 0.75rem; }
         .receipt-divider { height: 1px; background: #e2e8f0; margin: 0.75rem 0; }
         
+        /* Custom Details Marker */
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details > summary::after { content: '+'; float: right; font-weight: bold; font-size: 1.2em; color: #64748b; }
+        details[open] > summary::after { content: '-'; color: #6366f1; }
+
         input, select { -webkit-appearance: none; }
     </style>
 </head>
@@ -227,9 +233,13 @@
             <main class="flex-1 overflow-y-auto p-4 pb-20 md:pb-8 relative">
                 <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto no-scrollbar">
-                        <table class="w-full text-left border-collapse min-w-[600px]">
+                        <table class="w-full text-left border-collapse">
                             <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-100">
-                                <tr><th class="p-4">Customer</th><th class="p-4 hidden sm:table-cell">Status</th><th class="p-4 text-right">Action</th></tr>
+                                <tr>
+                                    <th class="p-4 w-auto">Customer</th>
+                                    <th class="p-4 hidden sm:table-cell w-24 text-center">Status</th>
+                                    <th class="p-4 w-24 text-right">Action</th>
+                                </tr>
                             </thead>
                             <tbody id="customer-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
@@ -249,21 +259,32 @@
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center gap-4"><div class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold border border-indigo-200 shadow-inner shrink-0"><i class="fa-solid fa-user"></i></div><div class="overflow-hidden"><h2 class="text-lg font-bold text-slate-800 truncate" id="c-name-display">User</h2><p class="text-xs text-slate-500 truncate" id="c-email-display">user@example.com</p></div></div>
             </div>
+            
             <div class="gradient-blue p-6 rounded-2xl shadow-lg text-white relative overflow-hidden">
                 <div class="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                <p class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Due Amount</p><h2 class="text-4xl font-extrabold mb-2" id="current-bill-amount">Rs 0.00</h2>
-                <div class="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm"><i class="fa-solid fa-calendar-day"></i> Current Month</div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p id="current-bill-label" class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Current Due</p>
+                        <h2 class="text-4xl font-extrabold mb-2" id="current-bill-amount">Rs 0.00</h2>
+                    </div>
+                    <div id="due-status-badge" class="hidden px-3 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md bg-white/20 border border-white/30"></div>
+                </div>
+                <div class="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm"><i class="fa-solid fa-calendar-day"></i> <span id="current-bill-month-display">Latest Bill</span></div>
             </div>
+
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Recent Bills</h3></div>
                 <div class="overflow-x-auto no-scrollbar"><table class="w-full text-left min-w-[600px]"><thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold sticky top-0"><tr><th class="p-3 pl-4">Month</th><th class="p-3">Usage</th><th class="p-3 text-right">Maint</th><th class="p-3 text-center">Fine</th><th class="p-3 text-right">Total</th><th class="p-3 text-center">Status</th></tr></thead><tbody id="bill-history-body" class="divide-y divide-slate-50 text-sm"></tbody></table></div>
                 <div id="no-bills-msg" class="hidden p-8 text-center text-slate-400 text-sm">No billing history yet.</div>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-4 border-b border-slate-100 bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Login Activity</h3></div>
-                <div class="overflow-x-auto no-scrollbar"><table class="w-full text-left min-w-[300px]"><tbody id="login-history-body" class="divide-y divide-slate-50 text-xs"></tbody></table></div>
-                <div id="no-logins-msg" class="hidden p-6 text-center text-slate-400 text-xs">No activity found</div>
-            </div>
+
+            <details class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden group">
+                <summary class="p-4 bg-slate-50/50 font-bold text-slate-700 text-sm uppercase tracking-wide flex justify-between items-center select-none">Login Activity</summary>
+                <div class="overflow-x-auto no-scrollbar border-t border-slate-100">
+                    <table class="w-full text-left min-w-[300px]"><tbody id="login-history-body" class="divide-y divide-slate-50 text-xs"></tbody></table>
+                    <div id="no-logins-msg" class="hidden p-6 text-center text-slate-400 text-xs">No activity found</div>
+                </div>
+            </details>
         </main>
     </section>
 
@@ -331,8 +352,7 @@
                 <span class="font-bold text-lg"><i class="fa-solid fa-receipt mr-2"></i>Bill Details</span>
                 <button onclick="document.getElementById('bill-details-modal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="bill-details-content" class="p-6 overflow-y-auto bg-slate-50">
-                </div>
+            <div id="bill-details-content" class="p-6 overflow-y-auto bg-slate-50"></div>
         </div>
     </div>
 
@@ -425,9 +445,9 @@
                         const tr = document.createElement('tr');
                         tr.className = "hover:bg-slate-50 transition border-b border-slate-50 last:border-0";
                         tr.innerHTML = `
-                            <td class="p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shadow-sm">${c.name.charAt(0).toUpperCase()}</div><div class="overflow-hidden"><div class="font-bold text-slate-800 text-sm truncate max-w-[150px]">${c.name}</div><div class="text-xs text-slate-400 truncate max-w-[150px]">${c.email}</div></div></div></td>
-                            <td class="p-4 hidden sm:table-cell"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold">ACTIVE</span></td>
-                            <td class="p-4 text-right"><button onclick="window.openCustomerDetails('${c.uid}', '${c.name.replace(/'/g, "\\'")}', '${c.email}')" class="bg-white border border-slate-200 text-indigo-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-50 shadow-sm">Manage</button></td>
+                            <td class="p-4 w-full"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shadow-sm shrink-0">${c.name.charAt(0).toUpperCase()}</div><div class="overflow-hidden"><div class="font-bold text-slate-800 text-sm truncate w-32 sm:w-auto">${c.name}</div><div class="text-xs text-slate-400 truncate w-32 sm:w-auto">${c.email}</div></div></div></td>
+                            <td class="p-4 hidden sm:table-cell w-24 text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold">ACTIVE</span></td>
+                            <td class="p-4 w-24 text-right"><button onclick="window.openCustomerDetails('${c.uid}', '${c.name.replace(/'/g, "\\'")}', '${c.email}')" class="bg-white border border-slate-200 text-indigo-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-indigo-50 shadow-sm active:scale-95 transition-transform">Manage</button></td>
                         `;
                         tbody.appendChild(tr);
                     }
@@ -435,11 +455,8 @@
             } catch (error) { console.error(error); }
         };
 
-        // --- NEW: View Bill Details Logic ---
         window.viewBillDetails = (billDataEncoded) => {
             const bill = JSON.parse(decodeURIComponent(billDataEncoded));
-            
-            // Re-calculate breakdown for display
             const consumed = bill.consumed;
             const intUnits = Math.floor(consumed);
             const decUnits = parseFloat((consumed - intUnits).toFixed(2));
@@ -460,55 +477,24 @@
                     <h3 class="text-2xl font-bold text-slate-800">${bill.month}</h3>
                     <span class="${bill.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${bill.status}</span>
                 </div>
-                
                 <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-4">
-                    <div class="receipt-row font-bold text-slate-700 mb-2 border-b border-slate-100 pb-2">
-                        <span>Meter Reading</span>
-                    </div>
+                    <div class="receipt-row font-bold text-slate-700 mb-2 border-b border-slate-100 pb-2"><span>Meter Reading</span></div>
                     <div class="receipt-row"><span>Previous</span> <span>${bill.prevUnits}</span></div>
                     <div class="receipt-row"><span>Present</span> <span>${bill.presentUnits}</span></div>
                     <div class="receipt-row text-blue-600 font-bold"><span>Consumed</span> <span>${bill.consumed} Units</span></div>
                 </div>
-
                 <div class="space-y-1">
                     <div class="receipt-row text-xs uppercase font-bold text-slate-400 mt-4 mb-2">Charges Breakdown</div>
-                    
-                    ${intUnits > 0 ? `
-                    <div class="receipt-row">
-                        <span>First ${Math.min(intUnits, 10)} Units <span class="text-xs text-slate-400">x Rs 65</span></span>
-                        <span>Rs ${tier1Cost.toFixed(2)}</span>
-                    </div>` : ''}
-                    
-                    ${intUnits > 10 ? `
-                    <div class="receipt-row">
-                        <span>Additional ${intUnits - 10} Units <span class="text-xs text-slate-400">x Rs 70</span></span>
-                        <span>Rs ${tier2Cost.toFixed(2)}</span>
-                    </div>` : ''}
-
-                    ${decUnits > 0 ? `
-                    <div class="receipt-row">
-                        <span>Decimal ${decUnits} Units <span class="text-xs text-slate-400">x Rs 60</span></span>
-                        <span>Rs ${costDec.toFixed(2)}</span>
-                    </div>` : ''}
-
+                    ${intUnits > 0 ? `<div class="receipt-row"><span>First ${Math.min(intUnits, 10)} Units <span class="text-xs text-slate-400">x Rs 65</span></span><span>Rs ${tier1Cost.toFixed(2)}</span></div>` : ''}
+                    ${intUnits > 10 ? `<div class="receipt-row"><span>Additional ${intUnits - 10} Units <span class="text-xs text-slate-400">x Rs 70</span></span><span>Rs ${tier2Cost.toFixed(2)}</span></div>` : ''}
+                    ${decUnits > 0 ? `<div class="receipt-row"><span>Decimal ${decUnits} Units <span class="text-xs text-slate-400">x Rs 60</span></span><span>Rs ${costDec.toFixed(2)}</span></div>` : ''}
                     <div class="receipt-divider"></div>
-                    
                     <div class="receipt-row"><span>Base Water Charge</span> <span>Rs ${waterCharge.toFixed(2)}</span></div>
                     <div class="receipt-row"><span>Maintenance Fee</span> <span>Rs ${maintain.toFixed(2)}</span></div>
-                    
-                    ${fine > 0 ? `
-                    <div class="receipt-row text-red-500 font-bold">
-                        <span>Late/Penalty Fines</span>
-                        <span>+ Rs ${fine.toFixed(2)}</span>
-                    </div>` : ''}
-
-                    <div class="receipt-row total">
-                        <span>Total Payable</span>
-                        <span>Rs ${total.toFixed(2)}</span>
-                    </div>
+                    ${fine > 0 ? `<div class="receipt-row text-red-500 font-bold"><span>Late/Penalty Fines</span><span>+ Rs ${fine.toFixed(2)}</span></div>` : ''}
+                    <div class="receipt-row total"><span>Total Payable</span><span>Rs ${total.toFixed(2)}</span></div>
                 </div>
             `;
-            
             document.getElementById('bill-details-content').innerHTML = html;
             document.getElementById('bill-details-modal').classList.remove('hidden');
             document.getElementById('bill-details-modal').classList.add('flex');
@@ -524,7 +510,7 @@
             const snap = await getDocs(q);
             let bills = [];
             snap.forEach(d => bills.push({id: d.id, ...d.data()}));
-            bills.sort((a, b) => b.month.localeCompare(a.month));
+            bills.sort((a, b) => b.month.localeCompare(a.month)); // Newest first
 
             if (bills.length > 0) document.getElementById('detail-last-units').textContent = bills[0].presentUnits;
             
@@ -538,7 +524,7 @@
                 bills.forEach((bill) => {
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 border-b border-slate-50";
-                    const billDataSafe = encodeURIComponent(JSON.stringify(bill)); // Safe encoding for button
+                    const billDataSafe = encodeURIComponent(JSON.stringify(bill)); 
                     
                     let actionHtml = '';
                     if (bill.status === 'Unpaid') {
@@ -650,40 +636,124 @@
             } catch (error) { toggleLoader(false); }
         };
 
+        // --- UPDATED REPORT GENERATION (Table Format Matching Sample) ---
         window.generateReport = async () => {
             const month = document.getElementById('report-month').value;
             if (!month) { showToast("Select month", "error"); return; }
             toggleLoader(true);
             try {
+                // Fetch bills
                 const q = query(collection(db, "bills"), where("month", "==", month));
                 const snap = await getDocs(q);
-                if(snap.empty) { toggleLoader(false); showToast("No Data", "error"); return; }
-                const reportData = []; snap.forEach(d => reportData.push({id: d.id, ...d.data()}));
+                if(snap.empty) { toggleLoader(false); showToast("No bills found", "error"); return; }
+                
+                const reportData = []; 
+                snap.forEach(d => reportData.push({id: d.id, ...d.data()}));
+                
+                // Fetch users
                 const uSnap = await getDocs(collection(db, "users"));
-                const uMap = {}; uSnap.forEach(d => uMap[d.id] = d.data());
+                const uMap = {}; 
+                uSnap.forEach(d => uMap[d.id] = d.data());
+
+                let totalUnits = 0;
+                let totalRevenue = 0;
+                reportData.forEach(bill => {
+                    totalUnits += bill.consumed;
+                    totalRevenue += bill.total;
+                });
                 
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-                doc.text(`HydroBill Report: ${month}`, 10, 10);
-                let y = 20;
+                
+                // Header
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("HydroBill - Monthly Report", 14, 15);
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "normal");
+                doc.text(`Billing Cycle: ${month}`, 14, 22);
+
+                // Table Columns (X positions adjusted for standard A4)
+                let y = 35;
+                const cols = [
+                    { title: "Customer", x: 14 },
+                    { title: "Prev", x: 60 },
+                    { title: "Pres", x: 80 },
+                    { title: "Used", x: 100 },
+                    { title: "Maint", x: 120 },
+                    { title: "Fine", x: 140 },
+                    { title: "Total", x: 160 },
+                    { title: "Status", x: 185 }
+                ];
+
+                // Draw Header Background
+                doc.setFontSize(9);
+                doc.setFont("helvetica", "bold");
+                doc.setFillColor(230, 230, 230);
+                doc.rect(12, y-5, 186, 7, "F"); 
+                cols.forEach(c => doc.text(c.title, c.x, y));
+                
+                y += 8;
+                doc.setFont("helvetica", "normal");
+
+                // Rows
                 reportData.forEach(b => {
-                    const name = uMap[b.customerId]?.name || 'Unknown';
-                    doc.text(`${name} - ${b.consumed} units - Rs ${b.total.toFixed(2)} (${b.status})`, 10, y);
-                    y += 10;
+                    if(y > 270) { doc.addPage(); y = 20; } // New page logic
+                    
+                    const name = uMap[b.customerId]?.name || "Unknown";
+                    doc.text(name.substring(0, 20), cols[0].x, y);
+                    doc.text(String(b.prevUnits), cols[1].x, y);
+                    doc.text(String(b.presentUnits), cols[2].x, y);
+                    doc.text(String(b.consumed), cols[3].x, y);
+                    doc.text(String(b.maintenance || 250), cols[4].x, y);
+                    doc.text(String(b.fineAmount || 0), cols[5].x, y);
+                    doc.text(b.total.toFixed(2), cols[6].x, y);
+                    doc.text(b.status, cols[7].x, y);
+                    y += 7;
                 });
-                doc.save(`Report_${month}.pdf`);
+
+                // Summary
+                y += 5;
+                doc.setFont("helvetica", "bold");
+                doc.text(`TOTAL UNITS: ${totalUnits.toFixed(2)}`, 14, y);
+                doc.text(`TOTAL REVENUE: Rs ${totalRevenue.toFixed(2)}`, 14, y + 5);
+
+                doc.save(`HydroBill_Report_${month}.pdf`);
                 toggleLoader(false);
-            } catch(e) { toggleLoader(false); }
+            } catch(e) { console.error(e); toggleLoader(false); }
         };
 
         function initCustomerDashboard(d) { document.getElementById('customer-dashboard').classList.remove('hidden'); document.getElementById('c-name-display').textContent = d.name; document.getElementById('c-email-display').textContent = d.email; loadCustomerBills(); loadLoginHistory(); }
+        
         async function loadCustomerBills() {
             const q = query(collection(db, "bills"), where("customerId", "==", currentUser.uid));
             const snap = await getDocs(q);
             const tbody = document.getElementById('bill-history-body'); tbody.innerHTML = '';
-            let bills = []; snap.forEach(d => bills.push(d.data())); bills.sort((a,b)=>b.month.localeCompare(a.month));
+            let bills = []; snap.forEach(d => bills.push(d.data())); 
+            // Sort by Month Descending (Newest first)
+            bills.sort((a,b)=>b.month.localeCompare(a.month)); 
+            
             if(bills.length>0) {
-                document.getElementById('current-bill-amount').textContent = "Rs "+bills[0].total.toFixed(2);
+                // Update Due Amount Card with Status
+                const latest = bills[0];
+                document.getElementById('current-bill-amount').textContent = "Rs "+latest.total.toFixed(2);
+                document.getElementById('current-bill-month-display').textContent = latest.month;
+                
+                // Dynamic Label & Badge Logic
+                const label = document.getElementById('current-bill-label');
+                const badge = document.getElementById('due-status-badge');
+                
+                badge.textContent = latest.status;
+                if(latest.status === 'Paid') {
+                    label.textContent = "Last Bill Paid";
+                    badge.className = "bg-emerald-500/20 text-emerald-100 border-emerald-400/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md border";
+                } else {
+                    label.textContent = "Current Due";
+                    badge.className = "bg-red-500/20 text-red-100 border-red-400/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md border";
+                }
+                badge.classList.remove('hidden');
+
+                // Render Table (Sorted)
                 bills.forEach(b => {
                     const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50";
                     tr.innerHTML = `<td class="p-3 pl-4 font-bold text-slate-700">${b.month}</td><td class="p-3 text-xs text-slate-500">${b.consumed} units</td><td class="p-3 text-right text-xs text-slate-400">250.00</td><td class="p-3 text-center text-xs text-slate-400">${b.fineAmount||'-'}</td><td class="p-3 text-right font-bold text-slate-800">Rs ${b.total.toFixed(0)}</td><td class="p-3 text-center"><span class="${b.status==='Paid'?'text-emerald-600 bg-emerald-50':'text-red-500 bg-red-50'} px-2 py-1 rounded text-[10px] font-bold uppercase border ${b.status==='Paid'?'border-emerald-100':'border-red-100'}">${b.status}</span></td>`;
@@ -692,6 +762,7 @@
                 document.getElementById('no-bills-msg').classList.add('hidden');
             } else document.getElementById('no-bills-msg').classList.remove('hidden');
         }
+        
         async function loadLoginHistory() {
             const q = query(collection(db, "login_logs"), where("uid", "==", currentUser.uid));
             const snap = await getDocs(q);
@@ -699,7 +770,7 @@
             let logs = []; snap.forEach(d => logs.push(d.data())); logs.sort((a,b)=>b.timestamp-a.timestamp);
             if(logs.length>0) {
                 document.getElementById('no-logins-msg').classList.add('hidden');
-                logs.slice(0,5).forEach(l => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-3 pl-4 text-slate-600 text-xs">${new Date(l.timestamp.seconds*1000).toLocaleDateString()}</td>`; tbody.appendChild(tr); });
+                logs.slice(0,5).forEach(l => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-3 pl-4 text-slate-600 text-xs">${new Date(l.timestamp.seconds*1000).toLocaleDateString()}</td><td class="p-3 text-right text-xs font-bold ${l.status==='Success'?'text-green-600':'text-red-500'}">${l.status}</td>`; tbody.appendChild(tr); });
             } else document.getElementById('no-logins-msg').classList.remove('hidden');
         }
 
