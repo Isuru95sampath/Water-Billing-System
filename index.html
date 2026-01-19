@@ -38,17 +38,53 @@
 
         /* --- UI ELEMENTS --- */
         .glass {
-            background: rgba(255, 255,255, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255,255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15);
         }
 
+        .input-modern {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #1e293b;
+        }
+        .input-modern:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-modern {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+        }
+        .btn-modern:active { transform: scale(0.96); }
+        .btn-modern:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
         .status-badge {
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 9999px;
             font-size: 10px;
-            font-weight: 800;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -60,7 +96,7 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 10px; }
 
         /* Toast */
         #toast-container {
@@ -68,18 +104,18 @@
             display: flex; flex-direction: column; gap: 10px; pointer-events: none;
         }
         .toast {
-            min-width: 300px; padding: 16px; border-radius: 12px;
-            background: white; box-shadow: 0 15px 30px -5px rgba(0,0,0,0.2);
+            min-width: 300px; padding: 16px; border-radius: 16px;
+            background: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             display: flex; align-items: center; justify-content: space-between;
             pointer-events: auto; border-left: 4px solid #6366f1;
-            animation: slideLeft 0.4s ease-out;
+            animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .toast.success { border-left-color: #10b981; }
         .toast.error { border-left-color: #ef4444; }
 
         @media (max-width: 640px) {
             #toast-container { top: auto; bottom: 20px; right: 10px; left: 10px; align-items: center; }
-            .toast { width: 100%; min-width: 0; animation: slideUpToast 0.4s ease-out; }
+            .toast { width: 100%; min-width: 0; animation: slideUpToast 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         }
 
         /* Loader */
@@ -87,6 +123,7 @@
             position: fixed; inset: 0; 
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.98) 0%, rgba(118, 75, 162, 0.98) 100%);
             z-index: 10000; display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
         }
         .spinner {
             width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2);
@@ -96,23 +133,25 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Gradients */
-        .gradient-blue { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .gradient-slate { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+        .gradient-slate { background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); }
         .gradient-emerald { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
 
         /* Buttons */
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
             transition: transform 0.1s ease;
         }
         .btn-primary:active { transform: scale(0.96); }
         
         .btn-fine {
             font-size: 10px; padding: 6px 10px;
-            border-radius: 6px; font-weight: 700;
+            border-radius: 8px; font-weight: 700;
             transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .btn-fine:active { transform: scale(0.95); }
+        .btn-fine:active { transform: scale(0.9); }
         
         /* Receipt Style */
         .receipt-row { display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 0.5rem; color: #475569; }
@@ -125,7 +164,11 @@
         details > summary::after { content: '+'; float: right; font-weight: bold; font-size: 1.2em; color: #64748b; }
         details[open] > summary::after { content: '-'; color: #6366f1; }
 
-        input, select { -webkit-appearance: none; }
+        input, select { appearance: none; -webkit-appearance: none; }
+        
+        /* Table Modernization */
+        .modern-table-row { transition: background-color 0.15s; }
+        .modern-table-row:hover { background-color: #f8fafc; }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col overflow-hidden bg-slate-100">
@@ -141,53 +184,54 @@
 
     <main id="auth-section" class="flex-grow flex items-center justify-center p-4 gradient-blue w-full h-full absolute inset-0 z-50 overflow-y-auto">
         <div class="w-full max-w-md my-auto pb-10">
-            <div class="text-center mb-8 fade-in">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl glass text-indigo-600 shadow-xl mb-4 ring-2 ring-white/20">
-                    <i class="fa-solid fa-droplet text-4xl"></i>
+            <div class="text-center mb-10 fade-in">
+                <div class="inline-flex items-center justify-center w-24 h-24 rounded-3xl glass text-indigo-600 shadow-2xl mb-6 ring-4 ring-white/20">
+                    <i class="fa-solid fa-droplet text-5xl"></i>
                 </div>
-                <h1 class="text-4xl font-extrabold text-white tracking-tight">HydroBill</h1>
+                <h1 class="text-5xl font-extrabold text-white tracking-tight">HydroBill</h1>
             </div>
 
-            <div id="view-role-select" class="glass rounded-3xl p-2 shadow-2xl scale-in mx-2">
-                <div class="p-4 text-center">
-                    <h2 class="text-lg font-bold text-slate-800">Select Your Role</h2>
+            <div id="view-role-select" class="glass rounded-3xl p-3 shadow-2xl scale-in mx-2">
+                <div class="p-5 text-center">
+                    <h2 class="text-xl font-bold text-slate-800">Select Your Role</h2>
+                    <p class="text-slate-400 text-sm mt-1">Choose access level to continue</p>
                 </div>
-                <div class="grid grid-cols-1 gap-3 p-3">
-                    <button onclick="window.selectRole('admin')" class="flex items-center p-4 rounded-xl bg-indigo-50/50 hover:bg-indigo-50 border border-transparent hover:border-indigo-200 transition-all active:scale-95">
-                        <div class="w-12 h-12 rounded-xl bg-indigo-500 flex items-center justify-center shadow-lg shrink-0"><i class="fa-solid fa-user-shield text-xl text-white"></i></div>
-                        <div class="ml-4 text-left"><span class="block font-bold text-slate-800 text-lg">Admin</span><span class="text-slate-500 text-xs">System Management</span></div>
+                <div class="grid grid-cols-1 gap-4 p-4">
+                    <button onclick="window.selectRole('admin')" class="group flex items-center p-5 rounded-2xl bg-indigo-50/50 hover:bg-indigo-50 border border-transparent hover:border-indigo-200 transition-all active:scale-[0.98]">
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shrink-0 group-hover:scale-110 transition-transform"><i class="fa-solid fa-user-shield text-2xl text-white"></i></div>
+                        <div class="ml-5 text-left"><span class="block font-bold text-slate-800 text-xl">Admin</span><span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">System Management</span></div>
                     </button>
-                    <button onclick="window.selectRole('customer')" class="flex items-center p-4 rounded-xl bg-cyan-50/50 hover:bg-cyan-50 border border-transparent hover:border-cyan-200 transition-all active:scale-95">
-                        <div class="w-12 h-12 rounded-xl bg-cyan-500 flex items-center justify-center shadow-lg shrink-0"><i class="fa-solid fa-user text-xl text-white"></i></div>
-                        <div class="ml-4 text-left"><span class="block font-bold text-slate-800 text-lg">Customer</span><span class="text-slate-500 text-xs">View Bills</span></div>
+                    <button onclick="window.selectRole('customer')" class="group flex items-center p-5 rounded-2xl bg-cyan-50/50 hover:bg-cyan-50 border border-transparent hover:border-cyan-200 transition-all active:scale-[0.98]">
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-500 flex items-center justify-center shadow-lg shrink-0 group-hover:scale-110 transition-transform"><i class="fa-solid fa-user text-2xl text-white"></i></div>
+                        <div class="ml-5 text-left"><span class="block font-bold text-slate-800 text-xl">Customer</span><span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">View Bills</span></div>
                     </button>
                 </div>
             </div>
 
-            <div id="view-login" class="glass rounded-3xl p-6 md:p-8 shadow-2xl hidden fade-in mx-2">
-                <button onclick="window.resetToStart()" class="text-xs font-bold text-slate-500 hover:text-indigo-600 mb-6 flex items-center gap-2 uppercase p-2 -ml-2"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800" id="login-title">Welcome Back</h2>
-                    <p class="text-slate-500 text-sm" id="login-subtitle">Sign in to continue</p>
+            <div id="view-login" class="glass rounded-3xl p-8 shadow-2xl hidden fade-in mx-2">
+                <button onclick="window.resetToStart()" class="text-xs font-bold text-slate-400 hover:text-indigo-600 mb-6 flex items-center gap-2 uppercase tracking-wider p-2 -ml-2 transition-colors"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-slate-800" id="login-title">Welcome Back</h2>
+                    <p class="text-slate-400 text-sm mt-2" id="login-subtitle">Sign in to continue</p>
                 </div>
-                <form onsubmit="window.handleLogin(event)" class="space-y-4">
-                    <div class="relative"><i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="email" id="login-email" required class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Email"></div>
-                    <div class="relative"><i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="password" id="login-password" required class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Password"></div>
-                    <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold shadow-lg mt-2 text-sm uppercase tracking-wider">Sign In</button>
+                <form onsubmit="window.handleLogin(event)" class="space-y-5">
+                    <div class="relative"><i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="email" id="login-email" required class="input-modern pl-12" placeholder="Email Address"></div>
+                    <div class="relative"><i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="password" id="login-password" required class="input-modern pl-12" placeholder="Password"></div>
+                    <button type="submit" class="w-full btn-modern btn-primary shadow-indigo-200 text-white py-4 mt-4 text-sm">Sign In</button>
                 </form>
-                <div class="mt-6 text-center"><p class="text-sm text-slate-600">No account? <button onclick="window.toggleAuthMode('register')" class="text-indigo-600 font-bold px-2 py-1">Create One</button></p></div>
+                <div class="mt-8 text-center"><p class="text-sm text-slate-600">No account? <button onclick="window.toggleAuthMode('register')" class="text-indigo-600 font-bold px-2 py-1 hover:text-indigo-700 transition-colors">Create One</button></p></div>
             </div>
 
-            <div id="view-register" class="glass rounded-3xl p-6 md:p-8 shadow-2xl hidden fade-in mx-2">
-                <button onclick="window.resetToStart()" class="text-xs font-bold text-slate-500 hover:text-indigo-600 mb-6 flex items-center gap-2 uppercase p-2 -ml-2"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                <h2 class="text-2xl font-bold text-slate-800 text-center mb-6">Create Account</h2>
-                <form onsubmit="window.handleRegister(event)" class="space-y-4">
-                    <div class="relative"><i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" id="reg-name" required class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Full Name"></div>
-                    <div class="relative"><i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="email" id="reg-email" required class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Email"></div>
-                    <div class="relative"><i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="password" id="reg-password" required minlength="6" class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl outline-none text-sm font-medium" placeholder="Password"></div>
-                    <button type="submit" class="w-full gradient-emerald text-white py-4 rounded-xl font-bold shadow-lg mt-2 text-sm uppercase tracking-wider">Create Account</button>
+            <div id="view-register" class="glass rounded-3xl p-8 shadow-2xl hidden fade-in mx-2">
+                <button onclick="window.resetToStart()" class="text-xs font-bold text-slate-400 hover:text-indigo-600 mb-6 flex items-center gap-2 uppercase tracking-wider p-2 -ml-2 transition-colors"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <h2 class="text-3xl font-bold text-slate-800 text-center mb-8">Create Account</h2>
+                <form onsubmit="window.handleRegister(event)" class="space-y-5">
+                    <div class="relative"><i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" id="reg-name" required class="input-modern pl-12" placeholder="Full Name"></div>
+                    <div class="relative"><i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="email" id="reg-email" required class="input-modern pl-12" placeholder="Email Address"></div>
+                    <div class="relative"><i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="password" id="reg-password" required minlength="6" class="input-modern pl-12" placeholder="Password (Min 6 chars)"></div>
+                    <button type="submit" class="w-full btn-modern gradient-emerald text-white py-4 shadow-emerald-200 mt-4 text-sm">Create Account</button>
                 </form>
-                <div class="mt-6 text-center"><p class="text-sm text-slate-600">Has account? <button onclick="window.toggleAuthMode('login')" class="text-indigo-600 font-bold px-2 py-1">Sign In</button></p></div>
+                <div class="mt-8 text-center"><p class="text-sm text-slate-600">Has account? <button onclick="window.toggleAuthMode('login')" class="text-indigo-600 font-bold px-2 py-1 hover:text-indigo-700 transition-colors">Sign In</button></p></div>
             </div>
         </div>
     </main>
@@ -195,134 +239,205 @@
     <section id="admin-dashboard" class="hidden h-full flex flex-col md:flex-row bg-slate-50 fade-in w-full">
         <nav class="md:hidden gradient-slate text-white p-4 flex justify-between items-center shadow-lg z-30 shrink-0">
             <div class="flex items-center gap-2"><i class="fa-solid fa-droplet text-cyan-400 text-xl"></i><span class="font-bold text-lg">HydroAdmin</span></div>
-            <button onclick="window.logout()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg font-semibold border border-white/10">Logout</button>
+            <button onclick="window.logout()" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-semibold border border-white/10 transition-colors">Logout</button>
         </nav>
 
         <aside class="hidden md:flex flex-col w-72 gradient-slate text-white p-6 shadow-2xl z-20 border-r border-slate-700">
             <div class="flex items-center gap-3 mb-10">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg"><i class="fa-solid fa-droplet text-xl"></i></div>
-                <div><span class="text-xl font-bold block">HydroAdmin</span><span class="text-[10px] text-slate-400 uppercase tracking-widest">Portal</span></div>
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg ring-2 ring-white/10"><i class="fa-solid fa-droplet text-xl"></i></div>
+                <div><span class="text-2xl font-bold block">HydroAdmin</span><span class="text-[10px] text-slate-400 uppercase tracking-widest">Management Portal</span></div>
             </div>
             <div class="flex-grow space-y-3">
-                <button onclick="window.openAddCustomerModal()" class="w-full flex items-center gap-3 px-4 py-3 bg-indigo-600 rounded-xl text-white shadow-lg hover:bg-indigo-500 transition-all font-semibold text-sm"><i class="fa-solid fa-plus text-lg"></i> Add Customer</button>
+                <button onclick="window.openAddCustomerModal()" class="w-full flex items-center gap-3 px-4 py-4 bg-indigo-600 rounded-2xl text-white shadow-lg hover:bg-indigo-500 transition-all font-bold text-sm active:scale-[0.98]"><i class="fa-solid fa-plus text-lg"></i> Add Customer</button>
+                <button onclick="window.openResetPasswordModal()" class="w-full flex items-center gap-3 px-4 py-4 text-indigo-200 hover:bg-white/5 rounded-2xl transition-all font-semibold text-sm hover:text-white"><i class="fa-solid fa-key"></i> Reset Password</button>
             </div>
-            <button onclick="window.logout()" class="flex items-center gap-3 px-4 py-3 text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all text-sm font-semibold mt-6 border-t border-slate-700"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            <button onclick="window.logout()" class="flex items-center gap-3 px-4 py-4 text-slate-400 hover:text-white hover:bg-white/5 rounded-2xl transition-all text-sm font-semibold mt-6 border-t border-slate-700"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         </aside>
 
         <div class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50 relative">
             <div class="bg-white border-b border-slate-200 p-4 md:p-8 shadow-sm z-10 shrink-0">
-                <div class="md:hidden mb-4">
-                     <button onclick="window.openAddCustomerModal()" class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 rounded-xl text-white shadow font-bold text-sm active:scale-95"><i class="fa-solid fa-user-plus"></i> Add New Customer</button>
+                <div class="md:hidden mb-6 grid grid-cols-2 gap-3">
+                     <button onclick="window.openAddCustomerModal()" class="flex items-center justify-center gap-2 px-4 py-3.5 bg-indigo-600 rounded-xl text-white shadow-lg font-bold text-sm active:scale-95 transition-transform"><i class="fa-solid fa-user-plus"></i> Add</button>
+                     <button onclick="window.openResetPasswordModal()" class="flex items-center justify-center gap-2 px-4 py-3.5 bg-slate-700 rounded-xl text-white shadow-lg font-bold text-sm active:scale-95 transition-transform"><i class="fa-solid fa-key"></i> Reset</button>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-4">
-                    <div class="col-span-1 gradient-slate rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
-                        <div class="relative z-10"><p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Customers</p><h3 class="text-3xl font-bold" id="total-customers-count">0</h3></div>
-                        <i class="fa-solid fa-users absolute bottom-2 right-2 text-4xl text-white/5"></i>
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+                    <div class="col-span-1 gradient-slate rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
+                        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/5 rounded-full blur-xl group-hover:bg-white/10 transition-all"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div><p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Total Customers</p><h3 class="text-4xl font-extrabold" id="total-customers-count">0</h3></div>
+                            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><i class="fa-solid fa-users text-white/80"></i></div>
+                        </div>
                     </div>
-                    <div class="col-span-1 md:col-span-2 flex flex-col md:flex-row gap-2">
-                        <input type="month" id="report-month" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-indigo-500">
-                        <button onclick="window.generateReport()" class="w-full md:w-auto bg-slate-800 text-white px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap shadow hover:bg-slate-700 active:scale-95"><i class="fa-solid fa-download mr-1"></i> PDF</button>
+                    <div class="col-span-1 md:col-span-2 flex flex-col md:flex-row gap-3">
+                        <input type="month" id="report-month" class="input-modern w-full md:w-auto">
+                        <button onclick="window.openReportModal()" class="w-full md:w-auto bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm whitespace-nowrap shadow-lg shadow-slate-300 hover:bg-slate-700 active:scale-95 transition-all flex items-center justify-center gap-2"><i class="fa-solid fa-file-invoice"></i> Generate Report</button>
                     </div>
                 </div>
-                <div class="bg-slate-100 px-3 py-2 rounded-xl flex items-center border border-transparent focus-within:border-indigo-300 focus-within:bg-white transition-all">
-                    <i class="fa-solid fa-search text-slate-400 mr-2"></i>
-                    <input type="text" id="admin-search" onkeyup="window.renderCustomerTable()" placeholder="Search customers..." class="w-full bg-transparent outline-none text-sm py-1">
+                <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl flex items-center focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 transition-all shadow-sm">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 mr-3 text-lg"></i>
+                    <input type="text" id="admin-search" onkeyup="window.renderCustomerTable()" placeholder="Search customers by name..." class="w-full bg-transparent outline-none text-sm py-1 font-medium text-slate-700 placeholder:text-slate-400">
+                    <button onclick="document.getElementById('admin-search').value=''; window.renderCustomerTable()" id="clear-search" class="hidden text-slate-400 hover:text-red-500 text-sm px-2"><i class="fa-solid fa-circle-xmark"></i></button>
                 </div>
             </div>
 
             <main class="flex-1 overflow-y-auto p-4 pb-20 md:pb-8 relative">
-                <div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto no-scrollbar">
                         <table class="w-full text-left border-collapse">
                             <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-100">
                                 <tr>
-                                    <th class="p-4 w-auto">Customer</th>
-                                    <th class="p-4 hidden sm:table-cell w-24 text-center">Status</th>
-                                    <th class="p-4 w-24 text-right">Action</th>
+                                    <th class="p-5 pl-6 w-auto">Customer Details</th>
+                                    <th class="p-5 hidden sm:table-cell w-32 text-center">Account Status</th>
+                                    <th class="p-5 pr-6 w-40 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="customer-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
                     </div>
-                    <div id="no-customers-msg" class="hidden p-8 text-center text-slate-400"><i class="fa-solid fa-inbox text-3xl mb-2"></i><p class="text-sm">No customers found</p></div>
+                    <div id="no-customers-msg" class="hidden p-12 text-center text-slate-400"><i class="fa-solid fa-inbox text-4xl mb-3 opacity-50"></i><p class="text-sm font-medium">No customers found</p></div>
                 </div>
             </main>
         </div>
     </section>
 
     <section id="customer-dashboard" class="hidden h-full flex flex-col bg-slate-100 fade-in overflow-hidden w-full">
-        <nav class="bg-white shadow-sm px-4 py-3 flex justify-between items-center z-20 shrink-0">
-            <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center"><i class="fa-solid fa-droplet text-white text-sm"></i></div><span class="text-slate-800 font-bold text-lg">HydroBill</span></div>
-            <div class="flex items-center gap-3"><span class="text-xs font-bold text-slate-600 hidden sm:block bg-slate-50 px-3 py-1 rounded-md" id="customer-name-display">User</span><button onclick="window.logout()" class="text-slate-500 hover:text-red-500 text-sm font-semibold px-2 py-1"><i class="fa-solid fa-right-from-bracket"></i></button></div>
+        <nav class="bg-white shadow-sm px-4 py-3 flex justify-between items-center z-20 shrink-0 border-b border-slate-100">
+            <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200"><i class="fa-solid fa-droplet text-white text-lg"></i></div><span class="text-slate-800 font-bold text-xl tracking-tight">HydroBill</span></div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-bold text-slate-500 hidden sm:block bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200" id="customer-name-display">User</span>
+                <button onclick="window.openResetPasswordModal()" class="w-9 h-9 flex items-center justify-center bg-slate-50 text-indigo-500 hover:bg-indigo-50 rounded-xl text-sm transition-all border border-slate-200"><i class="fa-solid fa-key"></i></button>
+                <button onclick="window.logout()" class="w-9 h-9 flex items-center justify-center bg-slate-50 text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl text-sm transition-all border border-slate-200"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
         </nav>
+        
         <main class="flex-1 overflow-y-auto p-4 pb-24 space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                <div class="flex items-center gap-4"><div class="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold border border-indigo-200 shadow-inner shrink-0"><i class="fa-solid fa-user"></i></div><div class="overflow-hidden"><h2 class="text-lg font-bold text-slate-800 truncate" id="c-name-display">User</h2><p class="text-xs text-slate-500 truncate" id="c-email-display">user@example.com</p></div></div>
+            
+            <div id="payment-alert" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-5 rounded-xl shadow-sm relative" role="alert">
+                <div class="flex items-start">
+                    <div class="bg-red-100 p-2 rounded-lg mr-4 text-red-500"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
+                    <div>
+                        <p class="font-bold text-sm mb-1">වැදගත් දැනුම්දීමකි!</p>
+                        <p class="text-xs leading-relaxed text-red-600/80">ලබන මස පළමු වෙනිදාට පෙර ජලබිල ගෙවීමට කාරුණික වන්න. එසේ නොගෙවීමෙන් රු.50 ක දඩ මුදලක් ගෙවීමට සිදු වේ. පහළොස් වෙනිදට පෙර ජල බිල ගෙවීම සිදු නොකළහොත් ජල කප්පාදුවක් සිදුකිරීමට සිදුවෙයි.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5">
+                <div class="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-3xl font-bold border border-indigo-100 shadow-inner shrink-0"><i class="fa-solid fa-user"></i></div>
+                <div class="overflow-hidden">
+                    <h2 class="text-xl font-bold text-slate-800 truncate" id="c-name-display">User</h2>
+                    <p class="text-sm text-slate-500 truncate" id="c-email-display">user@example.com</p>
+                </div>
             </div>
             
-            <div class="gradient-blue p-6 rounded-2xl shadow-lg text-white relative overflow-hidden">
-                <div class="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p id="current-bill-label" class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Current Due</p>
-                        <h2 class="text-4xl font-extrabold mb-2" id="current-bill-amount">Rs 0.00</h2>
+            <div class="gradient-blue p-8 rounded-3xl shadow-xl shadow-indigo-200 text-white relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <p id="current-bill-label" class="text-indigo-200 text-[10px] font-bold uppercase tracking-wider mb-2 opacity-80">Current Outstanding Balance</p>
+                            <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight" id="current-bill-amount">Rs 0.00</h2>
+                        </div>
+                        <div id="due-status-badge" class="hidden px-4 py-2 rounded-full text-[10px] font-bold uppercase backdrop-blur-md bg-white/20 border border-white/30 shadow-lg"></div>
                     </div>
-                    <div id="due-status-badge" class="hidden px-3 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md bg-white/20 border border-white/30"></div>
+                    <div class="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-sm border border-white/10"><i class="fa-regular fa-calendar"></i> <span id="current-bill-month-display">Latest Bill</span></div>
                 </div>
-                <div class="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm"><i class="fa-solid fa-calendar-day"></i> <span id="current-bill-month-display">Latest Bill</span></div>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Recent Bills</h3></div>
-                <div class="overflow-x-auto no-scrollbar"><table class="w-full text-left min-w-[600px]"><thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold sticky top-0"><tr><th class="p-3 pl-4">Month</th><th class="p-3">Usage</th><th class="p-3 text-right">Maint</th><th class="p-3 text-center">Fine</th><th class="p-3 text-right">Total</th><th class="p-3 text-center">Status</th></tr></thead><tbody id="bill-history-body" class="divide-y divide-slate-50 text-sm"></tbody></table></div>
-                <div id="no-bills-msg" class="hidden p-8 text-center text-slate-400 text-sm">No billing history yet.</div>
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50"><h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Recent Bills</h3></div>
+                <div class="overflow-x-auto no-scrollbar"><table class="w-full text-left min-w-[600px]"><thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold sticky top-0"><tr><th class="p-4 pl-6">Month</th><th class="p-4">Usage</th><th class="p-4 text-right">Maint</th><th class="p-4 text-center">Fine</th><th class="p-4 text-right">Total</th><th class="p-4 text-center">Status</th><th class="p-4 text-right pr-6">Details</th></tr></thead><tbody id="bill-history-body" class="divide-y divide-slate-50 text-sm"></tbody></table></div>
+                <div id="no-bills-msg" class="hidden p-12 text-center text-slate-400 text-sm">No billing history yet.</div>
             </div>
 
             <details class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden group">
-                <summary class="p-4 bg-slate-50/50 font-bold text-slate-700 text-sm uppercase tracking-wide flex justify-between items-center select-none">Login Activity</summary>
+                <summary class="p-4 bg-slate-50/50 font-bold text-slate-700 text-xs uppercase tracking-wide flex justify-between items-center select-none hover:bg-slate-50 transition-colors">Login Activity</summary>
                 <div class="overflow-x-auto no-scrollbar border-t border-slate-100">
                     <table class="w-full text-left min-w-[300px]"><tbody id="login-history-body" class="divide-y divide-slate-50 text-xs"></tbody></table>
-                    <div id="no-logins-msg" class="hidden p-6 text-center text-slate-400 text-xs">No activity found</div>
+                    <div id="no-logins-msg" class="hidden p-8 text-center text-slate-400 text-xs">No activity found</div>
                 </div>
             </details>
         </main>
     </section>
 
-    <div id="customer-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-end md:items-center justify-center z-50 p-0 md:p-4">
-        <div class="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden slide-up-mobile md:animate-scale-in max-h-[90vh] flex flex-col">
-            <div class="gradient-slate px-5 py-4 flex justify-between items-center text-white shrink-0"><span class="font-bold text-lg">Add Customer</span><button onclick="window.closeAddCustomerModal()" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full"><i class="fa-solid fa-xmark"></i></button></div>
-            <form onsubmit="window.handleAddCustomer(event)" class="p-6 space-y-4 overflow-y-auto">
-                <input type="text" id="new-name" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium" placeholder="Full Name">
-                <input type="email" id="new-email" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium" placeholder="Email">
-                <input type="password" id="new-pass" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium" placeholder="Password">
-                <div class="pt-2"><button type="submit" class="w-full p-4 btn-primary text-white rounded-xl font-bold shadow-md">Create Customer</button></div>
+    <div id="reset-password-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center z-[70] p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden scale-in border border-slate-100">
+            <div class="bg-slate-800 px-6 py-5 flex justify-between items-center text-white">
+                <span class="font-bold text-lg">Reset Password</span>
+                <button onclick="document.getElementById('reset-password-modal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form onsubmit="window.handlePasswordReset(event)" class="p-6 space-y-5">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2 ml-1">Current Password</label>
+                    <input type="password" id="old-pass" required class="input-modern">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2 ml-1">New Password</label>
+                    <input type="password" id="new-pass-reset" required minlength="6" class="input-modern">
+                </div>
+                <button type="submit" class="w-full btn-modern btn-primary text-white py-3.5 shadow-indigo-200">Update Password</button>
             </form>
         </div>
     </div>
 
-    <div id="customer-details-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-end md:items-center justify-center z-40 p-0 md:p-4">
-        <div class="bg-white w-full md:max-w-4xl rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden h-[95vh] md:h-auto md:max-h-[90vh] flex flex-col slide-up-mobile md:animate-scale-in">
-            <div class="gradient-slate px-5 py-4 flex justify-between items-center text-white shrink-0">
-                <div class="overflow-hidden mr-4"><h3 class="font-bold text-lg truncate" id="detail-customer-name">Name</h3><p class="text-xs text-slate-300 truncate" id="detail-customer-email">email</p></div>
-                <button onclick="window.closeCustomerDetailsModal()" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full shrink-0"><i class="fa-solid fa-xmark"></i></button>
+    <div id="customer-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-end md:items-center justify-center z-50 p-0 md:p-4">
+        <div class="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden slide-up-mobile md:animate-scale-in max-h-[90vh] flex flex-col border-t md:border border-slate-200">
+            <div class="gradient-slate px-6 py-5 flex justify-between items-center text-white shrink-0"><span class="font-bold text-lg">Add Customer</span><button onclick="window.closeAddCustomerModal()" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors"><i class="fa-solid fa-xmark"></i></button></div>
+            <form onsubmit="window.handleAddCustomer(event)" class="p-6 space-y-4 overflow-y-auto">
+                <input type="text" id="new-name" required class="input-modern" placeholder="Full Name">
+                <input type="email" id="new-email" required class="input-modern" placeholder="Email Address">
+                <input type="password" id="new-pass" required class="input-modern" placeholder="Password">
+                <div class="pt-4"><button type="submit" class="w-full btn-modern btn-primary text-white py-4 shadow-lg shadow-indigo-200">Create Customer</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="report-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden scale-in border border-slate-100">
+            <div class="gradient-slate px-6 py-5 flex justify-between items-center text-white">
+                <span class="font-bold text-lg">Monthly Report</span>
+                <button onclick="document.getElementById('report-modal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="flex-1 overflow-y-auto bg-slate-50 p-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-sm">
-                        <p class="text-xs text-slate-500 uppercase font-bold mb-1">Last Reading</p>
-                        <div class="flex items-baseline gap-2 mb-4"><span class="text-4xl font-extrabold text-blue-600" id="detail-last-units">0</span><span class="text-sm font-bold text-blue-400">Units</span></div>
-                        <button onclick="window.openBillingModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center gap-2 active:scale-95"><i class="fa-solid fa-calculator"></i> New Bill</button>
+            <div class="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+                <div class="space-y-4">
+                    <label class="block text-xs font-bold text-slate-500 uppercase">Fixed Expenses</label>
+                    <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200"><i class="fa-solid fa-lightbulb text-yellow-500 w-6 text-center"></i><input type="number" id="report-light-bill" placeholder="Light Bill Amount" class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-slate-700 p-2"></div>
+                    <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200"><i class="fa-solid fa-faucet text-blue-500 w-6 text-center"></i><input type="number" id="report-water-bill" placeholder="Water Bill (Supplier)" class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-slate-700 p-2"></div>
+                    <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200"><i class="fa-solid fa-user-tie text-purple-500 w-6 text-center"></i><input type="number" id="report-salary" placeholder="Supplier Salary" class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-slate-700 p-2"></div>
+                </div>
+                <div class="border-t border-slate-100 pt-5">
+                    <div class="flex justify-between items-center mb-3"><label class="block text-xs font-bold text-slate-500 uppercase">Extra Expenses</label><button onclick="window.addExtraExpenseField()" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg hover:bg-emerald-200 font-bold transition-colors"><i class="fa-solid fa-plus mr-1"></i> Add Item</button></div>
+                    <div id="extra-expenses-container" class="space-y-2"></div>
+                </div>
+                <button onclick="window.generateFinalReport()" class="w-full btn-modern btn-primary text-white py-4 shadow-lg shadow-indigo-200 mt-2">Download PDF Report</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customer-details-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-end md:items-center justify-center z-40 p-0 md:p-4">
+        <div class="bg-white w-full md:max-w-4xl rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden h-[95vh] md:h-auto md:max-h-[90vh] flex flex-col slide-up-mobile md:animate-scale-in border-t md:border border-slate-200">
+            <div class="gradient-slate px-6 py-5 flex justify-between items-center text-white shrink-0">
+                <div class="overflow-hidden mr-4"><h3 class="font-bold text-xl truncate" id="detail-customer-name">Name</h3><p class="text-xs text-slate-300 truncate" id="detail-customer-email">email</p></div>
+                <button onclick="window.closeCustomerDetailsModal()" class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-full shrink-0 hover:bg-white/20 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto bg-slate-50 p-4 md:p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-3xl border border-blue-50 shadow-sm relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-blue-100 transition-colors"></div>
+                        <p class="text-xs text-slate-400 uppercase font-bold mb-2 ml-1">Last Meter Reading</p>
+                        <div class="flex items-baseline gap-2 mb-6"><span class="text-5xl font-extrabold text-blue-600" id="detail-last-units">0</span><span class="text-sm font-bold text-blue-400">Units</span></div>
+                        <button onclick="window.openBillingModal()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center justify-center gap-2 active:scale-[0.98]"><i class="fa-solid fa-calculator"></i> Generate New Bill</button>
                     </div>
-                    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm md:h-[400px] flex flex-col">
-                        <div class="p-3 bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase">Billing History</div>
-                        <div class="overflow-auto flex-1">
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm md:h-[400px] flex flex-col">
+                        <div class="p-4 bg-slate-50 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">Billing History</div>
+                        <div class="overflow-auto flex-1 p-2">
                             <table class="w-full text-left text-sm min-w-[650px]">
                                 <thead class="bg-slate-50 sticky top-0 text-[10px] uppercase text-slate-400 font-bold border-b border-slate-100">
                                     <tr><th class="p-3">Month</th><th class="p-3">Usage</th><th class="p-3 text-right">Total</th><th class="p-3 text-center">Status</th><th class="p-3 text-right">Action</th></tr>
                                 </thead>
                                 <tbody id="detail-history-body" class="divide-y divide-slate-100"></tbody>
                             </table>
-                            <div id="detail-no-history" class="p-8 text-center text-slate-400 text-xs hidden">No history found</div>
+                            <div id="detail-no-history" class="p-12 text-center text-slate-400 text-xs hidden">No history found</div>
                         </div>
                     </div>
                 </div>
@@ -331,39 +446,39 @@
     </div>
 
     <div id="billing-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm hidden items-end md:items-center justify-center z-50 p-0 md:p-4">
-        <div class="bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] slide-up-mobile md:animate-scale-in">
-            <div class="gradient-blue px-5 py-4 flex justify-between items-center text-white shrink-0"><span class="font-bold text-lg">Generate Bill</span><button onclick="window.closeBillingModal()" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full"><i class="fa-solid fa-xmark"></i></button></div>
-            <form onsubmit="window.handleBillingSubmit(event)" class="flex-1 overflow-y-auto p-5">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Previous</label><input type="text" id="modal-prev-units" readonly class="w-full bg-slate-100 text-slate-500 p-3 rounded-xl border border-transparent font-bold text-center"></div>
-                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Bill Month</label><input type="month" id="modal-month" required class="w-full bg-white border border-slate-300 p-3 rounded-xl text-sm font-semibold"></div>
+        <div class="bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] slide-up-mobile md:animate-scale-in border-t md:border border-slate-200">
+            <div class="gradient-blue px-6 py-5 flex justify-between items-center text-white shrink-0"><span class="font-bold text-lg">Generate New Bill</span><button onclick="window.closeBillingModal()" class="w-9 h-9 flex items-center justify-center bg-white/20 rounded-full hover:bg-white/30 transition-colors"><i class="fa-solid fa-xmark"></i></button></div>
+            <form onsubmit="window.handleBillingSubmit(event)" class="flex-1 overflow-y-auto p-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-2 ml-1">Previous</label><input type="text" id="modal-prev-units" readonly class="input-modern bg-slate-100 text-slate-500 font-bold text-center border-transparent shadow-none"></div>
+                    <div><label class="text-[10px] font-bold text-slate-500 uppercase block mb-2 ml-1">Bill Month</label><input type="month" id="modal-month" required class="input-modern"></div>
                 </div>
-                <div class="mb-5"><label class="text-[10px] font-bold text-blue-600 uppercase block mb-1">New Reading</label><input type="number" id="modal-present-units" required min="0" step="0.01" oninput="window.previewCalculation()" class="w-full bg-blue-50 border-2 border-blue-200 focus:border-blue-500 p-4 rounded-xl text-blue-700 font-bold text-3xl text-right placeholder-blue-200 outline-none" placeholder="0.00"></div>
-                <div id="calc-breakdown" class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-5 text-sm space-y-2"><p class="text-center text-slate-400 text-xs italic">Enter a reading to see breakdown</p></div>
-                <div class="flex justify-between items-center pt-2 border-t border-slate-100 mb-4"><span class="font-bold text-slate-600">Total:</span><span id="preview-total" class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Rs 0.00</span></div>
-                <button type="submit" class="w-full btn-primary text-white py-4 rounded-xl font-bold shadow-lg">Save Bill</button>
+                <div class="mb-6"><label class="text-[10px] font-bold text-blue-600 uppercase block mb-2 ml-1">Current Meter Reading</label><input type="number" id="modal-present-units" required min="0" step="0.01" oninput="window.previewCalculation()" class="input-modern bg-blue-50 border-2 border-blue-200 focus:border-blue-500 text-blue-700 font-bold text-3xl text-right placeholder-blue-200 shadow-inner" placeholder="0.00"></div>
+                <div id="calc-breakdown" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 mb-6 text-sm space-y-3 min-h-[100px] flex items-center justify-center"><p class="text-center text-slate-400 text-xs italic">Enter a reading to preview calculation</p></div>
+                <div class="flex justify-between items-center pt-4 border-t border-slate-100 mb-6"><span class="font-bold text-slate-600">Total Payable:</span><span id="preview-total" class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Rs 0.00</span></div>
+                <button type="submit" class="w-full btn-modern btn-primary text-white py-4 shadow-lg shadow-indigo-200">Save & Issue Bill</button>
             </form>
         </div>
     </div>
 
     <div id="bill-details-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm hidden items-end md:items-center justify-center z-[60] p-0 md:p-4">
-        <div class="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] slide-up-mobile md:animate-scale-in">
-            <div class="bg-slate-800 px-5 py-4 flex justify-between items-center text-white shrink-0">
-                <span class="font-bold text-lg"><i class="fa-solid fa-receipt mr-2"></i>Bill Details</span>
-                <button onclick="document.getElementById('bill-details-modal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] slide-up-mobile md:animate-scale-in border-t md:border border-slate-200">
+            <div class="bg-slate-800 px-6 py-5 flex justify-between items-center text-white shrink-0">
+                <span class="font-bold text-lg"><i class="fa-solid fa-receipt mr-2"></i>Invoice Details</span>
+                <button onclick="document.getElementById('bill-details-modal').classList.add('hidden')" class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-full hover:bg-white/20 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="bill-details-content" class="p-6 overflow-y-auto bg-slate-50"></div>
         </div>
     </div>
 
-    <footer class="fixed bottom-0 left-0 w-full gradient-slate text-center py-2 text-slate-400 text-[10px] font-semibold shadow-2xl z-50 border-t border-slate-700 md:text-xs md:py-4">
-        <div class="flex items-center justify-center gap-2"><i class="fa-solid fa-code text-indigo-400"></i><span>Developed by <span class="text-white font-bold">Isuru Sampath</span></span></div>
+    <footer class="fixed bottom-0 left-0 w-full gradient-slate text-center py-3 md:py-4 text-slate-400 text-[10px] font-semibold shadow-2xl z-50 border-t border-slate-700 md:text-xs">
+        <div class="flex items-center justify-center gap-2"><i class="fa-solid fa-code text-indigo-400"></i><span>Developed by <span class="text-white font-bold">Isuru Sampath(RAAZ..)</span></span></div>
     </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, setDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, setDoc, doc, updateDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAgiS8AwDIV8quJ5xK1RhynNvdXp5GTyEw", authDomain: "hydrobill-mobile.firebaseapp.com", projectId: "hydrobill-mobile", storageBucket: "hydrobill-mobile.firebasestorage.app", messagingSenderId: "518368679428", appId: "1:518368679428:web:8e7af73daaf04f77130751" };
         const app = initializeApp(firebaseConfig);
@@ -389,7 +504,7 @@
             const c = document.getElementById('toast-container');
             const t = document.createElement('div');
             t.className = `toast ${type}`;
-            t.innerHTML = `<div class="flex items-center gap-3"><i class="fa-solid ${type==='success'?'fa-circle-check text-green-500':'fa-circle-exclamation text-red-500'} text-xl"></i><div><p class="text-slate-700 font-bold text-sm">${msg}</p></div></div>`;
+            t.innerHTML = `<div class="flex items-center gap-4"><i class="fa-solid ${type==='success'?'fa-circle-check text-green-500':'fa-circle-exclamation text-red-500'} text-xl"></i><div><p class="text-slate-800 font-bold text-sm">${msg}</p></div></div>`;
             c.appendChild(t);
             setTimeout(() => { t.style.opacity = '0'; t.style.transform = window.innerWidth < 640 ? 'translateY(100px)' : 'translateX(400px)'; setTimeout(() => t.remove(), 300); }, 3000);
         }
@@ -426,32 +541,99 @@
         };
         window.logout = async () => { try { await signOut(auth); window.location.reload(); } catch(e){} };
 
+        // --- PASSWORD RESET ---
+        window.openResetPasswordModal = () => { document.getElementById('reset-password-modal').classList.remove('hidden'); document.getElementById('reset-password-modal').classList.add('flex'); };
+        window.handlePasswordReset = async (e) => {
+            e.preventDefault();
+            const oldPass = document.getElementById('old-pass').value;
+            const newPass = document.getElementById('new-pass-reset').value;
+            toggleLoader(true);
+            try {
+                const credential = EmailAuthProvider.credential(currentUser.email, oldPass);
+                await reauthenticateWithCredential(currentUser, credential);
+                await updatePassword(currentUser, newPass);
+                showToast("Password updated!");
+                document.getElementById('reset-password-modal').classList.add('hidden');
+                e.target.reset();
+            } catch(e) { showToast("Error: " + e.message, "error"); }
+            toggleLoader(false);
+        };
+
         function initAdminDashboard() { document.getElementById('admin-dashboard').classList.remove('hidden'); document.getElementById('report-month').value = new Date().toISOString().slice(0, 7); renderCustomerTable(); }
         
         window.renderCustomerTable = async () => {
             const tbody = document.getElementById('customer-table-body');
-            const search = document.getElementById('admin-search').value.toLowerCase();
+            const noMsg = document.getElementById('no-customers-msg');
+            const searchInput = document.getElementById('admin-search');
+            const clearBtn = document.getElementById('clear-search');
+            const search = searchInput.value.toLowerCase().trim();
+            
+            // Toggle clear button
+            search.length > 0 ? clearBtn.classList.remove('hidden') : clearBtn.classList.add('hidden');
+
             tbody.innerHTML = '';
             try {
                 const q = query(collection(db, "users"), where("role", "==", "customer"));
                 const snap = await getDocs(q);
                 document.getElementById('total-customers-count').textContent = snap.size;
-                if(snap.empty) document.getElementById('no-customers-msg').classList.remove('hidden');
-                else document.getElementById('no-customers-msg').classList.add('hidden');
+                
+                if(snap.empty) { noMsg.classList.remove('hidden'); return; }
+                noMsg.classList.add('hidden');
 
+                // NEW: Sort customers alphabetically (A-Z)
+                let customers = [];
                 snap.forEach((docSnap) => {
-                    const c = docSnap.data();
-                    if (c.name.toLowerCase().includes(search) || c.email.toLowerCase().includes(search)) {
+                    customers.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                customers.sort((a, b) => a.name.localeCompare(b.name));
+
+                let matchFound = false; // Flag for single name logic
+
+                customers.forEach((c) => {
+                    const cName = c.name.toLowerCase();
+                    
+                    // LOGIC UPDATE: 
+                    // 1. If search is empty, show all.
+                    // 2. If search has text, find the first name that STARTS with search text.
+                    // 3. Once one match is found, stop rendering others (Show only one name).
+                    
+                    const isMatch = search ? cName.startsWith(search) : true;
+
+                    if (isMatch) {
+                        if (search && matchFound) {
+                            // If we are searching and already found a match, skip the rest
+                            return; 
+                        }
+                        
+                        // Render the row
+                        matchFound = true;
                         const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50 transition border-b border-slate-50 last:border-0";
+                        tr.className = "modern-table-row hover:bg-slate-50 border-b border-slate-50 last:border-0 transition-colors";
                         tr.innerHTML = `
-                            <td class="p-4 w-full"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shadow-sm shrink-0">${c.name.charAt(0).toUpperCase()}</div><div class="overflow-hidden"><div class="font-bold text-slate-800 text-sm truncate w-32 sm:w-auto">${c.name}</div><div class="text-xs text-slate-400 truncate w-32 sm:w-auto">${c.email}</div></div></div></td>
-                            <td class="p-4 hidden sm:table-cell w-24 text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[10px] font-bold">ACTIVE</span></td>
-                            <td class="p-4 w-24 text-right"><button onclick="window.openCustomerDetails('${c.uid}', '${c.name.replace(/'/g, "\\'")}', '${c.email}')" class="bg-white border border-slate-200 text-indigo-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-indigo-50 shadow-sm active:scale-95 transition-transform">Manage</button></td>
+                            <td class="p-4 pl-6 w-full">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm shadow-sm shrink-0 ring-2 ring-white border border-indigo-100">${c.name.charAt(0).toUpperCase()}</div>
+                                    <div class="overflow-hidden">
+                                        <div class="font-bold text-slate-800 text-base truncate w-32 sm:w-auto">${c.name}</div>
+                                        <div class="text-xs text-slate-400 truncate w-32 sm:w-auto">${c.email}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4 hidden sm:table-cell w-32 text-center"><span class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border border-emerald-100">Active</span></td>
+                            <td class="p-4 pr-6 w-40 text-right">
+                                <button onclick="window.openCustomerDetails('${c.uid}', '${c.name.replace(/'/g, "\\'")}', '${c.email}')" class="bg-white border border-slate-200 text-indigo-600 px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-indigo-50 hover:border-indigo-200 shadow-sm active:scale-95 transition-all">Manage</button>
+                            </td>
                         `;
                         tbody.appendChild(tr);
                     }
                 });
+                
+                // If searching and no match found
+                if (search && !matchFound) {
+                    noMsg.innerHTML = '<i class="fa-solid fa-user-slash text-4xl mb-3 opacity-30"></i><p class="text-sm font-medium">No customer found matching "${search}"</p>';
+                    noMsg.classList.remove('hidden');
+                }
+
             } catch (error) { console.error(error); }
         };
 
@@ -473,26 +655,26 @@
             const total = bill.total;
 
             const html = `
-                <div class="text-center mb-6">
+                <div class="text-center mb-8">
                     <h3 class="text-2xl font-bold text-slate-800">${bill.month}</h3>
-                    <span class="${bill.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'} px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${bill.status}</span>
+                    <span class="${bill.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'} px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border border-${bill.status === 'Paid' ? 'emerald-200' : 'red-200'}">${bill.status}</span>
                 </div>
-                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-4">
-                    <div class="receipt-row font-bold text-slate-700 mb-2 border-b border-slate-100 pb-2"><span>Meter Reading</span></div>
-                    <div class="receipt-row"><span>Previous</span> <span>${bill.prevUnits}</span></div>
-                    <div class="receipt-row"><span>Present</span> <span>${bill.presentUnits}</span></div>
-                    <div class="receipt-row text-blue-600 font-bold"><span>Consumed</span> <span>${bill.consumed} Units</span></div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm mb-6">
+                    <div class="receipt-row font-bold text-slate-700 mb-4 border-b border-slate-100 pb-4"><span>Meter Reading</span></div>
+                    <div class="receipt-row"><span class="text-slate-500">Previous</span> <span class="font-medium text-slate-800">${bill.prevUnits}</span></div>
+                    <div class="receipt-row"><span class="text-slate-500">Present</span> <span class="font-medium text-slate-800">${bill.presentUnits}</span></div>
+                    <div class="receipt-row text-blue-600 font-bold mt-2"><span>Consumed</span> <span class="text-lg">${bill.consumed} Units</span></div>
                 </div>
-                <div class="space-y-1">
-                    <div class="receipt-row text-xs uppercase font-bold text-slate-400 mt-4 mb-2">Charges Breakdown</div>
-                    ${intUnits > 0 ? `<div class="receipt-row"><span>First ${Math.min(intUnits, 10)} Units <span class="text-xs text-slate-400">x Rs 65</span></span><span>Rs ${tier1Cost.toFixed(2)}</span></div>` : ''}
-                    ${intUnits > 10 ? `<div class="receipt-row"><span>Additional ${intUnits - 10} Units <span class="text-xs text-slate-400">x Rs 70</span></span><span>Rs ${tier2Cost.toFixed(2)}</span></div>` : ''}
-                    ${decUnits > 0 ? `<div class="receipt-row"><span>Decimal ${decUnits} Units <span class="text-xs text-slate-400">x Rs 60</span></span><span>Rs ${costDec.toFixed(2)}</span></div>` : ''}
+                <div class="space-y-2">
+                    <div class="receipt-row text-xs uppercase font-bold text-slate-400 mt-6 mb-4">Charges Breakdown</div>
+                    ${intUnits > 0 ? `<div class="receipt-row"><span>First ${Math.min(intUnits, 10)} Units <span class="text-xs text-slate-400 font-normal">x Rs 65</span></span><span class="font-medium">Rs ${tier1Cost.toFixed(2)}</span></div>` : ''}
+                    ${intUnits > 10 ? `<div class="receipt-row"><span>Additional ${intUnits - 10} Units <span class="text-xs text-slate-400 font-normal">x Rs 70</span></span><span class="font-medium">Rs ${tier2Cost.toFixed(2)}</span></div>` : ''}
+                    ${decUnits > 0 ? `<div class="receipt-row"><span>Decimal ${decUnits} Units <span class="text-xs text-slate-400 font-normal">x Rs 60</span></span><span class="font-medium">Rs ${costDec.toFixed(2)}</span></div>` : ''}
                     <div class="receipt-divider"></div>
-                    <div class="receipt-row"><span>Base Water Charge</span> <span>Rs ${waterCharge.toFixed(2)}</span></div>
-                    <div class="receipt-row"><span>Maintenance Fee</span> <span>Rs ${maintain.toFixed(2)}</span></div>
+                    <div class="receipt-row"><span class="text-slate-600">Base Water Charge</span> <span class="font-medium text-slate-800">Rs ${waterCharge.toFixed(2)}</span></div>
+                    <div class="receipt-row"><span class="text-slate-600">Maintenance Fee</span> <span class="font-medium text-slate-800">Rs ${maintain.toFixed(2)}</span></div>
                     ${fine > 0 ? `<div class="receipt-row text-red-500 font-bold"><span>Late/Penalty Fines</span><span>+ Rs ${fine.toFixed(2)}</span></div>` : ''}
-                    <div class="receipt-row total"><span>Total Payable</span><span>Rs ${total.toFixed(2)}</span></div>
+                    <div class="receipt-row total mt-4"><span>Total Payable</span><span>Rs ${total.toFixed(2)}</span></div>
                 </div>
             `;
             document.getElementById('bill-details-content').innerHTML = html;
@@ -507,79 +689,82 @@
             document.getElementById('detail-customer-email').textContent = email;
             
             const q = query(collection(db, "bills"), where("customerId", "==", uid));
-            const snap = await getDocs(q);
-            let bills = [];
-            snap.forEach(d => bills.push({id: d.id, ...d.data()}));
-            bills.sort((a, b) => b.month.localeCompare(a.month)); // Newest first
+            // Realtime updates
+            const unsubscribe = onSnapshot(q, (snap) => {
+                let bills = [];
+                snap.forEach(d => bills.push({id: d.id, ...d.data()}));
+                bills.sort((a, b) => b.month.localeCompare(a.month));
 
-            if (bills.length > 0) document.getElementById('detail-last-units').textContent = bills[0].presentUnits;
-            
-            const tbody = document.getElementById('detail-history-body');
-            const noHist = document.getElementById('detail-no-history');
-            tbody.innerHTML = '';
-            
-            if (bills.length === 0) noHist.classList.remove('hidden');
-            else {
-                noHist.classList.add('hidden');
-                bills.forEach((bill) => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 border-b border-slate-50";
-                    const billDataSafe = encodeURIComponent(JSON.stringify(bill)); 
-                    
-                    let actionHtml = '';
-                    if (bill.status === 'Unpaid') {
-                        actionHtml = `
-                            <div class="flex flex-col gap-1 items-end justify-end">
-                                <div class="flex gap-1">
-                                    <button onclick="window.viewBillDetails('${billDataSafe}')" class="bg-blue-100 text-blue-600 p-1.5 rounded-md hover:bg-blue-200 transition"><i class="fa-solid fa-eye"></i></button>
-                                    <button onclick="window.markBillAsPaid('${bill.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold shadow-sm hover:bg-emerald-700">PAY</button>
+                if (bills.length > 0) document.getElementById('detail-last-units').textContent = bills[0].presentUnits;
+                
+                const tbody = document.getElementById('detail-history-body');
+                const noHist = document.getElementById('detail-no-history');
+                tbody.innerHTML = '';
+                
+                if (bills.length === 0) noHist.classList.remove('hidden');
+                else {
+                    noHist.classList.add('hidden');
+                    bills.forEach((bill) => {
+                        const tr = document.createElement('tr');
+                        tr.className = "modern-table-row border-b border-slate-50 hover:bg-slate-50";
+                        const billDataSafe = encodeURIComponent(JSON.stringify(bill)); 
+                        
+                        let actionHtml = '';
+                        if (bill.status === 'Unpaid') {
+                            actionHtml = `
+                                <div class="flex flex-col gap-2 items-end justify-end">
+                                    <div class="flex gap-2">
+                                        <button onclick="window.viewBillDetails('${billDataSafe}')" class="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-100 transition text-xs"><i class="fa-solid fa-eye"></i></button>
+                                        <button onclick="window.markBillAsPaid('${bill.id}')" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-[10px] font-bold shadow-sm hover:bg-emerald-700 transition">PAY</button>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="window.addFineToBill('${bill.id}', 50)" class="btn-fine bg-orange-50 text-orange-600 border border-orange-100">+50</button>
+                                        <button onclick="window.addFineToBill('${bill.id}', 200)" class="btn-fine bg-red-50 text-red-600 border border-red-100">+200</button>
+                                    </div>
                                 </div>
-                                <div class="flex gap-1 mt-1">
-                                    <button onclick="window.addFineToBill('${bill.id}', 50)" class="btn-fine bg-orange-50 text-orange-600 border border-orange-100">+50</button>
-                                    <button onclick="window.addFineToBill('${bill.id}', 200)" class="btn-fine bg-red-50 text-red-600 border border-red-100">+200</button>
+                            `;
+                        } else {
+                            actionHtml = `
+                                <div class="flex justify-end items-center gap-3">
+                                    <button onclick="window.viewBillDetails('${billDataSafe}')" class="bg-slate-50 text-slate-500 p-2 rounded-lg hover:bg-slate-100 transition text-xs"><i class="fa-solid fa-eye"></i></button>
+                                    <span class="text-[10px] text-slate-300 font-bold uppercase tracking-wide"><i class="fa-solid fa-lock mr-1"></i>Paid</span>
                                 </div>
-                            </div>
-                        `;
-                    } else {
-                        actionHtml = `
-                            <div class="flex justify-end items-center gap-2">
-                                <button onclick="window.viewBillDetails('${billDataSafe}')" class="bg-blue-50 text-blue-500 p-1.5 rounded-md hover:bg-blue-100 transition"><i class="fa-solid fa-eye"></i></button>
-                                <span class="text-[10px] text-slate-300 font-bold uppercase"><i class="fa-solid fa-lock mr-1"></i>Paid</span>
-                            </div>
-                        `;
-                    }
+                            `;
+                        }
 
-                    tr.innerHTML = `
-                        <td class="p-3 text-xs font-bold text-slate-700 align-top pt-4">${bill.month}</td>
-                        <td class="p-3 text-xs text-slate-500 align-top pt-4">${bill.consumed}</td>
-                        <td class="p-3 text-right font-bold text-xs text-slate-800 align-top pt-4">
-                             ${bill.total.toFixed(0)}
-                             ${bill.fineAmount > 0 ? '<span class="text-[9px] text-red-500 block">(+Fine)</span>' : ''}
-                        </td>
-                        <td class="p-3 text-center align-top pt-4"><span class="${bill.status === 'Paid' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-red-500 bg-red-50 border-red-100'} border px-2 py-0.5 rounded text-[10px] font-bold uppercase">${bill.status}</span></td>
-                        <td class="p-3 text-right">${actionHtml}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+                        tr.innerHTML = `
+                            <td class="p-3 text-xs font-bold text-slate-700 align-top pt-4">${bill.month}</td>
+                            <td class="p-3 text-xs text-slate-500 align-top pt-4">${bill.consumed}</td>
+                            <td class="p-3 text-right font-bold text-xs text-slate-800 align-top pt-4">
+                                 ${bill.total.toFixed(0)}
+                                 ${bill.fineAmount > 0 ? '<span class="text-[9px] text-red-500 block font-normal">(+Fine)</span>' : ''}
+                            </td>
+                            <td class="p-3 text-center align-top pt-4"><span class="${bill.status === 'Paid' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-red-500 bg-red-50 border-red-100'} border px-2.5 py-1 rounded-md text-[10px] font-bold uppercase">${bill.status}</span></td>
+                            <td class="p-3 text-right pr-2">${actionHtml}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            });
+            
             document.getElementById('customer-details-modal').classList.remove('hidden');
             document.getElementById('customer-details-modal').classList.add('flex');
         };
         window.closeCustomerDetailsModal = () => { document.getElementById('customer-details-modal').classList.add('hidden'); document.getElementById('customer-details-modal').classList.remove('flex'); currentManageCustomerId = null; };
 
         window.markBillAsPaid = async (billId) => {
-            if(!confirm("Mark as PAID? Cannot be undone.")) return; toggleLoader(true);
-            try { await updateDoc(doc(db, "bills", billId), { status: 'Paid' }); showToast("Bill Paid"); openCustomerDetails(currentManageCustomerId, document.getElementById('detail-customer-name').textContent, document.getElementById('detail-customer-email').textContent); toggleLoader(false); } catch (e) { toggleLoader(false); showToast("Error", "error"); }
+            if(!confirm("Mark this bill as PAID? This cannot be undone.")) return; toggleLoader(true);
+            try { await updateDoc(doc(db, "bills", billId), { status: 'Paid' }); showToast("Bill Paid Successfully"); toggleLoader(false); } catch (e) { toggleLoader(false); showToast("Error updating status", "error"); }
         };
 
         window.addFineToBill = async (billId, fineAmount) => {
-            if(!confirm(`Add Rs ${fineAmount} fine?`)) return; toggleLoader(true);
+            if(!confirm(`Add Rs ${fineAmount} fine to this bill?`)) return; toggleLoader(true);
             try {
                 const ref = doc(db, "bills", billId); const snap = await getDoc(ref);
                 if (snap.exists() && snap.data().status === 'Unpaid') {
                     await updateDoc(ref, { total: snap.data().total + fineAmount, fineAmount: (snap.data().fineAmount || 0) + fineAmount });
-                    showToast("Fine Added"); openCustomerDetails(currentManageCustomerId, document.getElementById('detail-customer-name').textContent, document.getElementById('detail-customer-email').textContent);
-                } else showToast("Bill Paid/Error", "error");
+                    showToast("Fine Added"); 
+                } else showToast("Bill already paid or error", "error");
                 toggleLoader(false);
             } catch (e) { toggleLoader(false); }
         };
@@ -599,7 +784,7 @@
             const prev = parseFloat(document.getElementById('modal-prev-units').value) || 0;
             const pres = parseFloat(document.getElementById('modal-present-units').value) || 0;
             const breakdown = document.getElementById('calc-breakdown');
-            if (pres < prev) { breakdown.innerHTML = `<div class="text-red-500 text-xs font-bold text-center">Invalid Reading</div>`; document.getElementById('preview-total').textContent = "---"; return; }
+            if (pres < prev) { breakdown.innerHTML = `<div class="text-red-500 text-xs font-bold text-center bg-red-50 p-4 rounded-xl"><i class="fa-solid fa-circle-exclamation mr-2"></i> Invalid Reading</div>`; document.getElementById('preview-total').textContent = "---"; return; }
 
             const consumed = parseFloat((pres - prev).toFixed(2));
             const intUnits = Math.floor(consumed);
@@ -610,8 +795,10 @@
             const total = costInt + costDec + 250 + currentFineAmount;
 
             breakdown.innerHTML = `
-                <div class="flex justify-between text-slate-600 text-xs"><span>Units (${consumed})</span> <span class="font-bold">Rs ${(costInt+costDec).toFixed(2)}</span></div>
-                <div class="flex justify-between text-slate-600 text-xs border-t border-slate-200 mt-1 pt-1"><span>Maintenance</span> <span class="font-bold">Rs 250.00</span></div>
+                <div class="w-full space-y-2">
+                    <div class="flex justify-between items-center text-sm text-slate-600 p-2"><span>Consumption (${consumed})</span> <span class="font-bold text-slate-800">Rs ${(costInt+costDec).toFixed(2)}</span></div>
+                    <div class="flex justify-between items-center text-sm text-slate-600 border-t border-slate-200 pt-2 mt-2"><span>Maintenance Fee</span> <span class="font-bold text-slate-800">Rs 250.00</span></div>
+                </div>
             `;
             document.getElementById('preview-total').textContent = "Rs " + total.toFixed(2);
         };
@@ -631,136 +818,186 @@
 
             try {
                 await addDoc(collection(db, "bills"), { customerId: currentBillCustomerId, month: document.getElementById('modal-month').value, prevUnits: prev, presentUnits: pres, consumed: consumed, waterCost: costInt+costDec, maintenance: 250, fineAmount: 0, total: total, status: 'Unpaid', createdAt: new Date() });
-                toggleLoader(false); showToast("Bill Generated"); closeBillingModal();
-                openCustomerDetails(currentBillCustomerId, document.getElementById('detail-customer-name').textContent, document.getElementById('detail-customer-email').textContent);
+                toggleLoader(false); showToast("Bill Generated Successfully"); closeBillingModal();
             } catch (error) { toggleLoader(false); }
         };
 
-        // --- UPDATED REPORT GENERATION (Table Format Matching Sample) ---
-        window.generateReport = async () => {
+        // --- NEW: Report Generation Logic ---
+        window.openReportModal = () => {
             const month = document.getElementById('report-month').value;
-            if (!month) { showToast("Select month", "error"); return; }
+            if (!month) { showToast("Select a month first", "error"); return; }
+            document.getElementById('report-modal').classList.remove('hidden');
+            document.getElementById('report-modal').classList.add('flex');
+        };
+
+        window.addExtraExpenseField = () => {
+            const container = document.getElementById('extra-expenses-container');
+            const div = document.createElement('div');
+            div.className = "flex items-center gap-2 animate-[fadeIn_0.3s_ease-out]";
+            div.innerHTML = `
+                <input type="text" placeholder="Description" class="flex-1 p-3 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 font-medium">
+                <input type="number" placeholder="Amount" class="w-24 p-3 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 font-medium expense-amount">
+                <button onclick="this.parentElement.remove()" class="w-8 h-8 flex items-center justify-center bg-slate-100 text-red-400 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"><i class="fa-solid fa-trash text-xs"></i></button>
+            `;
+            container.appendChild(div);
+        };
+
+        window.generateFinalReport = async () => {
+            const month = document.getElementById('report-month').value;
+            const lightBill = parseFloat(document.getElementById('report-light-bill').value) || 0;
+            const waterBill = parseFloat(document.getElementById('report-water-bill').value) || 0;
+            const salary = parseFloat(document.getElementById('report-salary').value) || 0;
+
+            let extraExpenses = [];
+            let totalExtra = 0;
+            document.querySelectorAll('#extra-expenses-container > div').forEach(div => {
+                const inputs = div.querySelectorAll('input');
+                const desc = inputs[0].value;
+                const amt = parseFloat(inputs[1].value) || 0;
+                if(desc && amt > 0) {
+                    extraExpenses.push({ desc, amt });
+                    totalExtra += amt;
+                }
+            });
+
+            const totalExpenses = lightBill + waterBill + salary + totalExtra;
+
             toggleLoader(true);
             try {
-                // Fetch bills
                 const q = query(collection(db, "bills"), where("month", "==", month));
                 const snap = await getDocs(q);
-                if(snap.empty) { toggleLoader(false); showToast("No bills found", "error"); return; }
-                
                 const reportData = []; 
                 snap.forEach(d => reportData.push({id: d.id, ...d.data()}));
-                
-                // Fetch users
                 const uSnap = await getDocs(collection(db, "users"));
-                const uMap = {}; 
-                uSnap.forEach(d => uMap[d.id] = d.data());
+                const uMap = {}; uSnap.forEach(d => uMap[d.id] = d.data());
 
-                let totalUnits = 0;
-                let totalRevenue = 0;
-                reportData.forEach(bill => {
-                    totalUnits += bill.consumed;
-                    totalRevenue += bill.total;
-                });
+                let totalUnits = 0; let totalRevenue = 0;
+                reportData.forEach(bill => { totalUnits += bill.consumed; totalRevenue += bill.total; });
                 
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
+                // FIX: Safe library access
+                const jsPDFClass = window.jspdf?.jsPDF || window.jspdf;
+                if (!jsPDFClass) {
+                    throw new Error("PDF Library not loaded. Please check internet connection.");
+                }
+                const doc = new jsPDFClass();
                 
-                // Header
-                doc.setFontSize(14);
-                doc.setFont("helvetica", "bold");
-                doc.text("HydroBill - Monthly Report", 14, 15);
-                doc.setFontSize(10);
-                doc.setFont("helvetica", "normal");
-                doc.text(`Billing Cycle: ${month}`, 14, 22);
+                // FIX: Calculate netProfit BEFORE using it
+                const netProfit = totalRevenue - totalExpenses;
+                
+                doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text("HydroBill - Monthly Report", 14, 15);
+                doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text(`Billing Cycle: ${month}`, 14, 22);
+                doc.setDrawColor(200); doc.line(14, 24, 196, 24);
 
-                // Table Columns (X positions adjusted for standard A4)
                 let y = 35;
-                const cols = [
-                    { title: "Customer", x: 14 },
-                    { title: "Prev", x: 60 },
-                    { title: "Pres", x: 80 },
-                    { title: "Used", x: 100 },
-                    { title: "Maint", x: 120 },
-                    { title: "Fine", x: 140 },
-                    { title: "Total", x: 160 },
-                    { title: "Status", x: 185 }
-                ];
+                const cols = [{t:"Customer",x:14},{t:"Prev",x:55},{t:"Pres",x:75},{t:"Used",x:95},{t:"Maint",x:115},{t:"Fine",x:135},{t:"Total",x:155},{t:"Status",x:185}];
+                doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setFillColor(241, 245, 249); doc.rect(12, y-5, 186, 8, "F"); 
+                cols.forEach(c => doc.text(c.t, c.x, y)); y += 10; doc.setFont("helvetica", "normal");
 
-                // Draw Header Background
-                doc.setFontSize(9);
-                doc.setFont("helvetica", "bold");
-                doc.setFillColor(230, 230, 230);
-                doc.rect(12, y-5, 186, 7, "F"); 
-                cols.forEach(c => doc.text(c.title, c.x, y));
-                
-                y += 8;
-                doc.setFont("helvetica", "normal");
-
-                // Rows
                 reportData.forEach(b => {
-                    if(y > 270) { doc.addPage(); y = 20; } // New page logic
-                    
+                    if(y > 200) { doc.addPage(); y = 20; }
                     const name = uMap[b.customerId]?.name || "Unknown";
-                    doc.text(name.substring(0, 20), cols[0].x, y);
-                    doc.text(String(b.prevUnits), cols[1].x, y);
-                    doc.text(String(b.presentUnits), cols[2].x, y);
-                    doc.text(String(b.consumed), cols[3].x, y);
-                    doc.text(String(b.maintenance || 250), cols[4].x, y);
-                    doc.text(String(b.fineAmount || 0), cols[5].x, y);
-                    doc.text(b.total.toFixed(2), cols[6].x, y);
-                    doc.text(b.status, cols[7].x, y);
-                    y += 7;
+                    doc.text(name.substring(0, 20), cols[0].x, y); doc.text(String(b.prevUnits), cols[1].x, y); doc.text(String(b.presentUnits), cols[2].x, y); doc.text(String(b.consumed), cols[3].x, y); doc.text(String(b.maintenance||250), cols[4].x, y); doc.text(String(b.fineAmount||0), cols[5].x, y); doc.text(b.total.toFixed(2), cols[6].x, y); doc.text(b.status, cols[7].x, y);
+                    y += 8;
                 });
 
-                // Summary
-                y += 5;
-                doc.setFont("helvetica", "bold");
-                doc.text(`TOTAL UNITS: ${totalUnits.toFixed(2)}`, 14, y);
-                doc.text(`TOTAL REVENUE: Rs ${totalRevenue.toFixed(2)}`, 14, y + 5);
+                // Financial Summary
+                if (y > 180) { doc.addPage(); y = 20; }
+                y += 10;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+                doc.text("Financial Summary", 14, y);
+                y += 8; doc.setFontSize(10); doc.setFont("helvetica", "normal");
+
+                doc.text(`Total Collections (Revenue):`, 14, y); doc.text(`Rs ${totalRevenue.toFixed(2)}`, 160, y, {align:'right'}); y += 6;
+                doc.text(`Total Units Consumed:`, 14, y); doc.text(`${totalUnits.toFixed(2)}`, 160, y, {align:'right'}); y += 10;
+
+                doc.setFont("helvetica", "bold"); doc.text("Expenses:", 14, y); y += 6;
+                doc.setFont("helvetica", "normal");
+                
+                if(lightBill > 0) { doc.text(`Light Bill:`, 20, y); doc.text(`- Rs ${lightBill.toFixed(2)}`, 160, y, {align:'right'}); y += 6; }
+                if(waterBill > 0) { doc.text(`Water Bill :`, 20, y); doc.text(`- Rs ${waterBill.toFixed(2)}`, 160, y, {align:'right'}); y += 6; }
+                if(salary > 0) { doc.text(`Supplier Salary:`, 20, y); doc.text(`- Rs ${salary.toFixed(2)}`, 160, y, {align:'right'}); y += 6; }
+                
+                extraExpenses.forEach(exp => {
+                    doc.text(`${exp.desc}:`, 20, y); doc.text(`- Rs ${exp.amt.toFixed(2)}`, 160, y, {align:'right'}); y += 6;
+                });
+
+                y += 4;
+                doc.setLineWidth(0.5); doc.line(14, y, 170, y); y += 8;
+                
+                doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+                // FIX: Use calculated netProfit here
+                const profitColor = netProfit >= 0 ? [0, 128, 0] : [255, 0, 0];
+                doc.setTextColor(...profitColor);
+                doc.text(`NET BALANCE:`, 14, y); 
+                doc.text(`Rs ${netProfit.toFixed(2)}`, 160, y, {align:'right'});
 
                 doc.save(`HydroBill_Report_${month}.pdf`);
                 toggleLoader(false);
-            } catch(e) { console.error(e); toggleLoader(false); }
+                document.getElementById('report-modal').classList.add('hidden');
+            } catch(e) { console.error(e); toggleLoader(false); showToast("Error generating report: " + e.message, "error"); }
         };
 
         function initCustomerDashboard(d) { document.getElementById('customer-dashboard').classList.remove('hidden'); document.getElementById('c-name-display').textContent = d.name; document.getElementById('c-email-display').textContent = d.email; loadCustomerBills(); loadLoginHistory(); }
         
         async function loadCustomerBills() {
             const q = query(collection(db, "bills"), where("customerId", "==", currentUser.uid));
-            const snap = await getDocs(q);
-            const tbody = document.getElementById('bill-history-body'); tbody.innerHTML = '';
-            let bills = []; snap.forEach(d => bills.push(d.data())); 
-            // Sort by Month Descending (Newest first)
-            bills.sort((a,b)=>b.month.localeCompare(a.month)); 
             
-            if(bills.length>0) {
-                // Update Due Amount Card with Status
-                const latest = bills[0];
-                document.getElementById('current-bill-amount').textContent = "Rs "+latest.total.toFixed(2);
-                document.getElementById('current-bill-month-display').textContent = latest.month;
+            const unsubscribe = onSnapshot(q, (snap) => {
+                const tbody = document.getElementById('bill-history-body'); tbody.innerHTML = '';
+                let bills = []; 
+                snap.forEach(d => bills.push(d.data())); 
+                bills.sort((a,b)=>b.month.localeCompare(a.month)); 
                 
-                // Dynamic Label & Badge Logic
-                const label = document.getElementById('current-bill-label');
-                const badge = document.getElementById('due-status-badge');
-                
-                badge.textContent = latest.status;
-                if(latest.status === 'Paid') {
-                    label.textContent = "Last Bill Paid";
-                    badge.className = "bg-emerald-500/20 text-emerald-100 border-emerald-400/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md border";
-                } else {
-                    label.textContent = "Current Due";
-                    badge.className = "bg-red-500/20 text-red-100 border-red-400/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md border";
-                }
-                badge.classList.remove('hidden');
+                if(bills.length>0) {
+                    const latest = bills[0];
+                    document.getElementById('current-bill-amount').textContent = "Rs "+latest.total.toFixed(2);
+                    document.getElementById('current-bill-month-display').textContent = latest.month;
+                    
+                    const label = document.getElementById('current-bill-label');
+                    const badge = document.getElementById('due-status-badge');
+                    
+                    badge.textContent = latest.status;
+                    if(latest.status === 'Paid') {
+                        label.textContent = "Last Bill Paid";
+                        badge.className = "bg-emerald-500/20 text-emerald-100 border-emerald-400/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md border shadow-sm";
+                    } else {
+                        label.textContent = "Current Due";
+                        badge.className = "bg-red-500/20 text-red-100 border-red-400/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase backdrop-blur-md border shadow-sm";
+                    }
+                    badge.classList.remove('hidden');
 
-                // Render Table (Sorted)
-                bills.forEach(b => {
-                    const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50";
-                    tr.innerHTML = `<td class="p-3 pl-4 font-bold text-slate-700">${b.month}</td><td class="p-3 text-xs text-slate-500">${b.consumed} units</td><td class="p-3 text-right text-xs text-slate-400">250.00</td><td class="p-3 text-center text-xs text-slate-400">${b.fineAmount||'-'}</td><td class="p-3 text-right font-bold text-slate-800">Rs ${b.total.toFixed(0)}</td><td class="p-3 text-center"><span class="${b.status==='Paid'?'text-emerald-600 bg-emerald-50':'text-red-500 bg-red-50'} px-2 py-1 rounded text-[10px] font-bold uppercase border ${b.status==='Paid'?'border-emerald-100':'border-red-100'}">${b.status}</span></td>`;
-                    tbody.appendChild(tr);
-                });
-                document.getElementById('no-bills-msg').classList.add('hidden');
-            } else document.getElementById('no-bills-msg').classList.remove('hidden');
+                    bills.forEach(b => {
+                        const tr = document.createElement('tr'); tr.className = "modern-table-row border-b border-slate-50 hover:bg-slate-50";
+                        const billDataSafe = encodeURIComponent(JSON.stringify(b));
+                        
+                        tr.innerHTML = `
+                            <td class="p-4 pl-6 font-bold text-slate-700">${b.month}</td>
+                            <td class="p-4 text-xs text-slate-500">${b.consumed} units</td>
+                            <td class="p-4 text-right text-xs text-slate-400">250.00</td>
+                            <td class="p-4 text-center text-xs text-slate-400">${b.fineAmount||'-'}</td>
+                            <td class="p-4 text-right font-bold text-slate-800">Rs ${b.total.toFixed(0)}</td>
+                            <td class="p-4 text-center"><span class="${b.status==='Paid'?'text-emerald-600 bg-emerald-50 border-emerald-100':'text-red-500 bg-red-50 border-red-100'} px-3 py-1 rounded-lg text-[10px] font-bold uppercase border">${b.status}</span></td>
+                            <td class="p-4 text-right pr-6">
+                                <button onclick="window.viewBillDetails('${billDataSafe}')" class="bg-blue-50 text-blue-500 p-2 rounded-lg hover:bg-blue-100 transition text-xs"><i class="fa-solid fa-eye"></i></button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    document.getElementById('no-bills-msg').classList.add('hidden');
+                } else document.getElementById('no-bills-msg').classList.remove('hidden');
+                
+                // NOTIFICATION LOGIC - SINHALA
+                const today = new Date();
+                const latest = bills.length > 0 ? bills[0] : null;
+                const alertBox = document.getElementById('payment-alert');
+                
+                // Condition: After 10th AND (No bills OR Latest is Unpaid)
+                if (today.getDate() > 20 && (!latest || latest.status === 'Unpaid')) {
+                    alertBox.classList.remove('hidden');
+                } else {
+                    alertBox.classList.add('hidden');
+                }
+            });
         }
         
         async function loadLoginHistory() {
@@ -770,7 +1007,7 @@
             let logs = []; snap.forEach(d => logs.push(d.data())); logs.sort((a,b)=>b.timestamp-a.timestamp);
             if(logs.length>0) {
                 document.getElementById('no-logins-msg').classList.add('hidden');
-                logs.slice(0,5).forEach(l => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-3 pl-4 text-slate-600 text-xs">${new Date(l.timestamp.seconds*1000).toLocaleDateString()}</td><td class="p-3 text-right text-xs font-bold ${l.status==='Success'?'text-green-600':'text-red-500'}">${l.status}</td>`; tbody.appendChild(tr); });
+                logs.slice(0,5).forEach(l => { const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-4 pl-6 text-slate-600 text-xs">${new Date(l.timestamp.seconds*1000).toLocaleDateString()}</td><td class="p-4 text-right text-xs font-bold ${l.status==='Success'?'text-green-600':'text-red-500'}">${l.status}</td>`; tbody.appendChild(tr); });
             } else document.getElementById('no-logins-msg').classList.remove('hidden');
         }
 
